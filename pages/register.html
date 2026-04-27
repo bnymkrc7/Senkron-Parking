@@ -1,1 +1,156 @@
-<!-- Register Page Template -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senkron | Yeni Kayıt</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            color: #f8fafc;
+            padding: 2rem 0;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .form-control {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 12px;
+            padding: 12px;
+            transition: all 0.3s;
+        }
+        .form-control::placeholder { color: rgba(255, 255, 255, 0.4); }
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+        }
+        .form-control:disabled {
+            background: rgba(255, 255, 255, 0.01);
+            border-color: transparent;
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .btn-primary {
+            background-color: #38bdf8;
+            color: #0f172a;
+            border: none;
+            font-weight: 700;
+            padding: 14px;
+            border-radius: 12px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: #0ea5e9;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px #0ea5e9;
+        }
+        .btn-primary:disabled {
+            background-color: #475569;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+        .brand-logo { font-weight: 800; letter-spacing: 3px; color: #38bdf8; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-5">
+                <div class="card glass-card p-4 p-sm-5">
+                    <div class="card-body p-0">
+                        <div class="text-center mb-4">
+                            <h2 class="brand-logo mb-1">SENKRON</h2>
+                            <p class="text-secondary small text-uppercase fw-bold">Yeni Sürücü Kaydı</p>
+                        </div>
+                        
+                        <form id="registerForm" onsubmit="event.preventDefault();">
+                            <div class="row g-3 mb-3">
+                                <div class="col-6">
+                                    <label class="form-label small text-uppercase text-secondary fw-bold">Ad</label>
+                                    <input type="text" class="form-control" id="ad" placeholder="Adınız">
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small text-uppercase text-secondary fw-bold">Soyad</label>
+                                    <input type="text" class="form-control" id="soyad" placeholder="Soyadınız" disabled>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small text-uppercase text-secondary fw-bold">E-posta</label>
+                                <input type="email" class="form-control" id="mail" placeholder="ornek@mail.com" disabled>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label small text-uppercase text-secondary fw-bold">Plaka No</label>
+                                <input type="text" class="form-control" id="plaka" placeholder="34 ABC 123" disabled>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label small text-uppercase text-secondary fw-bold">Şifre</label>
+                                <input type="password" class="form-control" id="sifre" placeholder="••••••••" disabled>
+                            </div>
+
+                            <button type="submit" id="regBtn" class="btn btn-primary w-100" disabled>Kayıt İşlemini Tamamla</button>
+                        </form>
+
+                        <div class="text-center mt-4 pt-3 border-top border-secondary border-opacity-25">
+                            <span class="text-secondary small">Zaten hesabınız var mı?</span><br>
+                            <a href="login.html" class="text-info text-decoration-none small fw-bold mt-1 d-inline-block">← Giriş ekranına dön</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const fields = [
+            document.getElementById('ad'),
+            document.getElementById('soyad'),
+            document.getElementById('mail'),
+            document.getElementById('plaka'),
+            document.getElementById('sifre'),
+            document.getElementById('regBtn')
+        ];
+
+        fields.forEach((el, index) => {
+            if(index < fields.length - 1) {
+                el.addEventListener('input', () => {
+                    const nextEl = fields[index + 1];
+                    let isValid = el.value.trim().length >= 2;
+                    
+                    // E-posta alanı için özel doğrulama
+                    if(el.id === 'mail') {
+                        isValid = el.value.includes('@') && el.value.length > 5;
+                    }
+
+                    if(isValid) {
+                        nextEl.disabled = false;
+                    } else {
+                        for(let i = index + 1; i < fields.length; i++) {
+                            fields[i].disabled = true;
+                            if(fields[i].tagName === "INPUT") fields[i].value = "";
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html><!-- Register Page Template -->
