@@ -4,6 +4,7 @@ const db = require('./db_config'); // Az önce oluşturduğun veritabanı bağla
 
 const app = express();
 app.use(express.json()); // Gelen JSON verilerini okuyabilmek için
+app.use(express.static(__dirname)); // Sunum için eklendi: HTML, CSS ve JS dosyalarını tarayıcıya yollar
 
 // --- KAYIT OLMA API (Register) ---
 app.post('/api/register', async (req, res) => {
