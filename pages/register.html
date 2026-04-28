@@ -79,31 +79,31 @@
                             <p class="text-secondary small text-uppercase fw-bold">Yeni Sürücü Kaydı</p>
                         </div>
                         
-                        <form id="registerForm" onsubmit="event.preventDefault();">
+                        <form id="registerForm">
                             <div class="row g-3 mb-3">
                                 <div class="col-6">
                                     <label class="form-label small text-uppercase text-secondary fw-bold">Ad</label>
-                                    <input type="text" class="form-control" id="ad" placeholder="Adınız">
+                                    <input type="text" class="form-control" id="ad" placeholder="Adınız" required>
                                 </div>
                                 <div class="col-6">
                                     <label class="form-label small text-uppercase text-secondary fw-bold">Soyad</label>
-                                    <input type="text" class="form-control" id="soyad" placeholder="Soyadınız" disabled>
+                                    <input type="text" class="form-control" id="soyad" placeholder="Soyadınız" disabled required>
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label small text-uppercase text-secondary fw-bold">E-posta</label>
-                                <input type="email" class="form-control" id="mail" placeholder="ornek@mail.com" disabled>
+                                <input type="email" class="form-control" id="mail" placeholder="ornek@mail.com" disabled required>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label small text-uppercase text-secondary fw-bold">Plaka No</label>
-                                <input type="text" class="form-control" id="plaka" placeholder="34 ABC 123" disabled>
+                                <input type="text" class="form-control" id="plaka" placeholder="34 ABC 123" disabled required>
                             </div>
 
                             <div class="mb-4">
                                 <label class="form-label small text-uppercase text-secondary fw-bold">Şifre</label>
-                                <input type="password" class="form-control" id="sifre" placeholder="••••••••" disabled>
+                                <input type="password" class="form-control" id="sifre" placeholder="••••••••" disabled required>
                             </div>
 
                             <button type="submit" id="regBtn" class="btn btn-primary w-100" disabled>Kayıt İşlemini Tamamla</button>
@@ -120,6 +120,7 @@
     </div>
 
     <script>
+        // --- 1. GÖRSEL MANTIK: INPUTLARIN SIRAYLA AÇILMASI ---
         const fields = [
             document.getElementById('ad'),
             document.getElementById('soyad'),
@@ -135,7 +136,6 @@
                     const nextEl = fields[index + 1];
                     let isValid = el.value.trim().length >= 2;
                     
-                    // E-posta alanı için özel doğrulama
                     if(el.id === 'mail') {
                         isValid = el.value.includes('@') && el.value.length > 5;
                     }
@@ -151,6 +151,47 @@
                 });
             }
         });
+
+        // --- 2. BACKEND BAĞLANTISI VE YÖNLENDİRME ---
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const ad = document.getElementById('ad').value.trim();
+            const soyad = document.getElementById('soyad').value.trim();
+            const email = document.getElementById('mail').value.trim();
+            const plate_number = document.getElementById('plaka').value.trim();
+            const password = document.getElementById('sifre').value.trim();
+
+            const username = ad + " " + soyad;
+            const regBtn = document.getElementById('regBtn');
+
+            regBtn.disabled = true;
+            regBtn.innerText = "Kayıt Yapılıyor...";
+
+            fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, email, password, plate_number })
+            })
+            .then(response => {
+                if(response.status === 201) {
+                    alert("Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz.");
+                    // Önce giriş sayfasına gönderelim ki kullanıcı giriş yapabilsin
+                    window.location.href = 'login.html'; 
+                } else {
+                    return response.json().then(data => {
+                        alert(data.error || "Bir hata oluştu");
+                        regBtn.disabled = false;
+                        regBtn.innerText = "Kayıt İşlemini Tamamla";
+                    });
+                }
+            })
+            .catch(err => {
+                alert("Sunucu hatası! Lütfen backend'i kontrol et.");
+                regBtn.disabled = false;
+                regBtn.innerText = "Kayıt İşlemini Tamamla";
+            });
+        });
     </script>
 </body>
-</html><!-- Register Page Template -->
+</html>
