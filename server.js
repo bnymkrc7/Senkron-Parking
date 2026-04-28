@@ -16,8 +16,8 @@ app.post('/api/register', async (req, res) => {
 
         // 2. Kullanıcıyı veritabanına ekle
         const query = `INSERT INTO users (username, email, password, plate_number) VALUES (?, ?, ?, ?)`;
-        
-        db.run(query, [username, email, hashedPassword, plate_number], function(err) {
+
+        db.run(query, [username, email, hashedPassword, plate_number], function (err) {
             if (err) {
                 return res.status(400).json({ error: "Bu e-posta zaten kayıtlı veya bir hata oluştu." });
             }
@@ -32,7 +32,7 @@ app.post('/api/login', async (req, res) => {
     const { email, password } = req.body;
 
     const query = `SELECT * FROM users WHERE email = ?`;
-    
+
     db.get(query, [email], async (err, user) => {
         if (err) {
             return res.status(500).json({ error: "Sunucu hatası." });
@@ -47,9 +47,9 @@ app.post('/api/login', async (req, res) => {
             return res.status(401).json({ error: "Hatalı şifre!" });
         }
 
-        res.status(200).json({ 
-            message: "Giriş başarılı!", 
-            user: { id: user.id, username: user.username, plate: user.plate_number } 
+        res.status(200).json({
+            message: "Giriş başarılı!",
+            user: { id: user.id, username: user.username, plate: user.plate_number }
         });
     });
 });
