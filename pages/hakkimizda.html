@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senkron | Hakkımızda</title>
+    
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/style.css">
+
+    <style>
+        .page-header {
+            padding-top: 140px;
+            padding-bottom: 60px;
+            background: linear-gradient(135deg, rgba(13,110,253,0.05) 0%, rgba(13,110,253,0.15) 100%);
+            margin-bottom: 60px;
+            text-align: center;
+        }
+        .about-card {
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+        .about-card:hover {
+            transform: translateY(-5px);
+        }
+        .icon-wrapper {
+            width: 70px;
+            height: 70px;
+            background-color: rgba(13, 110, 253, 0.1);
+            color: var(--primary-color, #0d6efd);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="../index.html">
+                <i class="fa-solid fa-square-parking text-primary me-2"></i>SENKRON
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Ana Sayfa</a></li>
+                    <li class="nav-item"><a class="nav-link" href="abone.html">Abone Ol</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="hakkimizda.html">Hakkımızda</a></li>
+                    <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
+                        <a class="btn btn-outline-primary rounded-pill px-4 me-2" href="login.html">Giriş Yap</a>
+                        <a class="btn btn-primary rounded-pill px-4 shadow-sm" href="register.html">Kayıt Ol</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-3">Biz Kimiz?</h1>
+            <p class="lead text-muted mx-auto" style="max-width: 700px;">
+                Şehir içi otopark sorunlarına yenilikçi, hızlı ve akıllı çözümler üreten Senkron ekibi olarak hayatınızı kolaylaştırıyoruz.
+            </p>
+        </div>
+    </div>
+
+    <!-- About Content -->
+    <div class="container mb-5 pb-5">
+        
+        <div class="row align-items-center mb-5 pb-4">
+            <div class="col-lg-6 mb-4 mb-lg-0">
+                <img src="https://images.unsplash.com/photo-1573348722427-f1d6819fdf98?q=80&w=1000&auto=format&fit=crop" alt="Akıllı Otopark" class="img-fluid rounded-4 shadow-lg" style="object-fit: cover; height: 400px; width: 100%;">
+            </div>
+            <div class="col-lg-6 ps-lg-5">
+                <span class="text-primary fw-bold text-uppercase tracking-wide">Vizyonumuz</span>
+                <h2 class="fw-bold mt-2 mb-4">Geleceğin Akıllı Şehirlerine Senkronize Olun</h2>
+                <p class="text-muted mb-4">
+                    Trafik yoğunluğunun en büyük sebeplerinden biri olan "park yeri arama" sorununu kökünden çözmek için yola çıktık. Geliştirdiğimiz sensör ve yazılım altyapısıyla sürücülere anlık otopark verisi sunuyoruz.
+                </p>
+                <p class="text-muted mb-4">
+                    Geleneksel otopark bariyerleri, bilet makineleri ve sıra bekleme derdini ortadan kaldırarak QR kod ile tamamen dijital bir deneyim yaratmayı hedefliyoruz.
+                </p>
+                <div class="d-flex align-items-center mt-4">
+                    <div class="me-4">
+                        <h3 class="fw-bold text-dark mb-0">10+</h3>
+                        <span class="text-muted small">Aktif Otopark</span>
+                    </div>
+                    <div class="me-4">
+                        <h3 class="fw-bold text-dark mb-0">5K+</h3>
+                        <span class="text-muted small">Mutlu Sürücü</span>
+                    </div>
+                    <div>
+                        <h3 class="fw-bold text-dark mb-0">100%</h3>
+                        <span class="text-muted small">Dijital Sistem</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mt-2">
+            <div class="col-md-4">
+                <div class="about-card">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-leaf"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Çevre Dostu</h4>
+                    <p class="text-muted">Park yeri ararken harcanan yakıtı ve karbon emisyonunu azaltarak doğayı koruyoruz. Ayrıca kağıt bilet kullanımını sıfıra indiriyoruz.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="about-card">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Zaman Tasarrufu</h4>
+                    <p class="text-muted">Rezervasyon sistemimiz sayesinde gideceğiniz otoparkta yerinizin hazır olduğunu bilir, vakit kaybetmeden park edersiniz.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="about-card">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h4 class="fw-bold mb-3">Güvenlik Odaklı</h4>
+                    <p class="text-muted">Kapalı devre kamera sistemleri ve plaka tanıma altyapımız ile aracınız 7/24 güvende. Dijital ödeme ile de kişisel verileriniz koruma altında.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white pt-5 pb-3 mt-auto border-top border-primary border-4">
+        <div class="container">
+            <div class="row gy-4 mb-4">
+                <!-- Marka ve Açıklama -->
+                <div class="col-lg-4 col-md-6 pe-lg-5">
+                    <h4 class="fw-bold mb-3"><i class="fa-solid fa-square-parking text-primary me-2"></i>SENKRON</h4>
+                    <p class="text-white-50 small mb-4">
+                        Şehir içi otopark arama sorununa yenilikçi, hızlı ve akıllı çözümler üreten yeni nesil otopark yönetim sistemi. Vakit kaybetmeyin, hayatla senkronize olun.
+                    </p>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="text-white-50 text-decoration-none fs-5 hover-primary"><i class="fa-brands fa-twitter"></i></a>
+                        <a href="#" class="text-white-50 text-decoration-none fs-5 hover-primary"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#" class="text-white-50 text-decoration-none fs-5 hover-primary"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="text-white-50 text-decoration-none fs-5 hover-primary"><i class="fa-brands fa-linkedin"></i></a>
+                    </div>
+                </div>
+
+                <!-- Kurumsal -->
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="fw-bold mb-3 pb-2 border-bottom border-secondary d-inline-block">Kurumsal</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="hakkimizda.html" class="text-white-50 text-decoration-none hover-white">Hakkımızda</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white">Vizyon & Misyon</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white">Sıkça Sorulan Sorular</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white">KVKK Metni</a></li>
+                    </ul>
+                </div>
+
+                <!-- Hızlı Linkler -->
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="fw-bold mb-3 pb-2 border-bottom border-secondary d-inline-block">Hızlı İşlemler</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="abone.html" class="text-white-50 text-decoration-none hover-white"><i class="fa-solid fa-angle-right text-primary me-2"></i>Abone Başvurusu</a></li>
+                        <li class="mb-2"><a href="../index.html#dashboard" class="text-white-50 text-decoration-none hover-white"><i class="fa-solid fa-angle-right text-primary me-2"></i>Canlı Otopark Durumu</a></li>
+                        <li class="mb-2"><a href="login.html" class="text-white-50 text-decoration-none hover-white"><i class="fa-solid fa-angle-right text-primary me-2"></i>Üye Girişi</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white"><i class="fa-solid fa-angle-right text-primary me-2"></i>Öneri ve Şikayet</a></li>
+                    </ul>
+                </div>
+
+                <!-- İletişim -->
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="fw-bold mb-3 pb-2 border-bottom border-secondary d-inline-block">İletişim</h5>
+                    <ul class="list-unstyled text-white-50 small">
+                        <li class="mb-3 d-flex">
+                            <i class="fa-solid fa-location-dot mt-1 me-3 text-primary"></i>
+                            <span>Senkron Teknoloji Merkezi, Zemin Kat, Kadıköy / İstanbul</span>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="fa-solid fa-phone me-3 text-primary"></i>
+                            <span>0 (850) 123 45 67</span>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="fa-solid fa-envelope me-3 text-primary"></i>
+                            <span>destek@senkronparking.com</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <hr class="border-secondary mb-3">
+            
+            <!-- Alt Bilgi -->
+            <div class="row align-items-center small text-white-50">
+                <div class="col-12 text-center">
+                    &copy; 2026 Senkron Akıllı Otopark Sistemleri. Tüm hakları saklıdır.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
