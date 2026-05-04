@@ -174,3 +174,56 @@ body {
 .tracking-wide {
     letter-spacing: 0.1em;
 }
+
+/* Parking Map Specifics */
+.parking-map-container {
+    background-color: #cbd5e1; /* Asphalt color */
+    border-radius: 12px;
+    padding: 30px;
+    position: relative;
+    overflow-x: auto;
+}
+
+.road-line {
+    border: 2px dashed #f8fafc;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1;
+}
+
+.parking-row-top, .parking-row-bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    position: relative;
+    z-index: 2;
+}
+
+.parking-row-top {
+    margin-bottom: 80px; /* Road space */
+}
+
+.parking-spot.large {
+    height: 100px;
+    width: 60px;
+    font-size: 1rem;
+}
+
+.parking-spot.large i {
+    font-size: 1.5rem;
+}
+
+.nav-pills .nav-link {
+    color: var(--text-color);
+    border-radius: 50rem;
+    padding: 10px 24px;
+    font-weight: 600;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+    background-color: var(--primary-color);
+    color: white;
+}

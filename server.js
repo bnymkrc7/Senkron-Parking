@@ -1,8 +1,10 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const cors = require('cors'); 
 const db = require('./db_config'); // Az önce oluşturduğun veritabanı bağlantısı
 
 const app = express();
+app.use(cors());
 app.use(express.json()); // Gelen JSON verilerini okuyabilmek için
 app.use(express.static(__dirname)); // Sunum için eklendi: HTML, CSS ve JS dosyalarını tarayıcıya yollar
 
@@ -53,6 +55,32 @@ app.post('/api/login', async (req, res) => {
         });
     });
 });
+app.get('/api/parking-slots', (req, res) => {
+    const query = `SELECT * FROM parking_slots`;
+    
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: "Veriler alınamadı." });
+        }
+        res.status(200).json(rows);
+    });
+});
+
+
+app.patch('/api/parking-slots/:id', (req, res) => {
+    const { is_occupied } = req.body; // 1 (dolu) veya 0 (boş) gelecek
+    const { id } = req.params;
+
+    const query = `UPDATE parking_slots SET is_occupied = ? WHERE id = ?`;
+    
+    db.run(query, [is_occupied, id], function(err) {
+        if (err) {
+            return res.status(500).json({ error: "Güncelleme başarısız." });
+        }
+        res.status(200).json({ message: "Park yeri durumu güncellendi!" });
+    });
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Sunucu ${PORT} portunda çalışıyor...`);
