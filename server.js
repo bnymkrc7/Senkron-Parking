@@ -1,8 +1,10 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
+const cors = require('cors'); 
 const db = require('./db_config'); // Az önce oluşturduğun veritabanı bağlantısı
 
 const app = express();
+app.use(cors());
 app.use(express.json()); // Gelen JSON verilerini okuyabilmek için
 app.use(express.static(__dirname)); // Sunum için eklendi: HTML, CSS ve JS dosyalarını tarayıcıya yollar
 
