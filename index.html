@@ -1,24 +1,27 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Senkron | Akıllı Otopark Yönetim Sistemi</title>
-    
+
     <!-- Google Fonts: Outfit -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
     <!-- Navbar -->
@@ -27,7 +30,8 @@
             <a class="navbar-brand fw-bold" href="#">
                 <i class="fa-solid fa-square-parking text-primary me-2"></i>SENKRON
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -60,7 +64,8 @@
                         Otopark Aramaya <br><span class="text-gradient">Son Verin!</span>
                     </h1>
                     <p class="lead text-muted mb-5">
-                        Senkron Akıllı Otopark Sistemi ile boş park yerlerini anlık olarak haritadan görün, tek tıkla rezervasyon yapın ve QR kod ile sıra beklemeden giriş yapın.
+                        Senkron Akıllı Otopark Sistemi ile boş park yerlerini anlık olarak haritadan görün, tek tıkla
+                        rezervasyon yapın ve QR kod ile sıra beklemeden giriş yapın.
                     </p>
                     <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-lg-start gap-3">
                         <a href="#dashboard" class="btn btn-primary btn-lg rounded-pill shadow px-5">Boş Yer Bul</a>
@@ -75,17 +80,30 @@
                                 <h4 class="fw-bold text-dark mb-2">
                                     <i class="fa-solid fa-square-parking text-primary me-2"></i>SENKRON
                                 </h4>
-                                <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1 fw-medium" style="font-size: 0.75rem;">
+                                <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1 fw-medium"
+                                    style="font-size: 0.75rem;">
                                     <i class="fa-solid fa-bolt text-warning me-1"></i> Yeni Nesil Otopark Deneyimi
                                 </span>
                             </div>
                             <div class="row g-2">
-                                <div class="col-4"><div class="mini-spot occupied">Dolu</div></div>
-                                <div class="col-4"><div class="mini-spot empty">Boş</div></div>
-                                <div class="col-4"><div class="mini-spot empty">Boş</div></div>
-                                <div class="col-4"><div class="mini-spot reserved">Rezerve</div></div>
-                                <div class="col-4"><div class="mini-spot empty">Boş</div></div>
-                                <div class="col-4"><div class="mini-spot occupied">Dolu</div></div>
+                                <div class="col-4">
+                                    <div class="mini-spot occupied">Dolu</div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="mini-spot empty">Boş</div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="mini-spot empty">Boş</div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="mini-spot reserved">Rezerve</div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="mini-spot empty">Boş</div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="mini-spot occupied">Dolu</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -101,7 +119,7 @@
                 <h2 class="fw-bold">Canlı Otopark Durumu</h2>
                 <p class="text-muted">Aşağıdaki panelden anlık olarak boş yerleri görebilirsiniz.</p>
             </div>
-            
+
             <div class="row">
                 <!-- Status Indicators -->
                 <div class="col-12 mb-4">
@@ -113,7 +131,8 @@
                             <div class="status-indicator bg-danger"></div> <span class="ms-2 fw-medium">Dolu Alan</span>
                         </div>
                         <div class="d-flex align-items-center">
-                            <div class="status-indicator bg-warning"></div> <span class="ms-2 fw-medium">Rezerve (Senin)</span>
+                            <div class="status-indicator bg-warning"></div> <span class="ms-2 fw-medium">Rezerve
+                                (Senin)</span>
                         </div>
                     </div>
                 </div>
@@ -123,46 +142,11 @@
                     <div class="parking-grid glass-card p-4 shadow-sm">
                         <div class="row text-center border-bottom pb-3 mb-4">
                             <div class="col-6 fw-bold text-muted">A Blok (Zemin Kat)</div>
-                            <div class="col-6 fw-bold text-muted text-end">24 / 50 Boş</div>
+                            <!-- JS ile güncellenecek olan sayaç alanı (ID eklendi) -->
+                            <div class="col-6 fw-bold text-muted text-end" id="emptyCountDisplay">0 / 0 Boş</div>
                         </div>
-                        <div class="row g-3">
-                            <!-- Spots -->
-                            <div class="col-3 col-md-2">
-                                <div class="parking-spot empty" data-bs-toggle="tooltip" title="A-01: Boş. Rezervasyon için tıkla.">A-01</div>
-                            </div>
-                            <div class="col-3 col-md-2">
-                                <div class="parking-spot occupied" data-bs-toggle="tooltip" title="A-02: Dolu">A-02 <i class="fa-solid fa-car text-white-50 mt-1"></i></div>
-                            </div>
-                            <div class="col-3 col-md-2">
-                                <div class="parking-spot empty" data-bs-toggle="tooltip" title="A-03: Boş. Rezervasyon için tıkla.">A-03</div>
-                            </div>
-                            <div class="col-3 col-md-2">
-                                <div class="parking-spot reserved" data-bs-toggle="tooltip" title="A-04: Sizin rezervasyonunuz.">A-04 <i class="fa-regular fa-clock text-dark mt-1"></i></div>
-                            </div>
-                            <div class="col-3 col-md-2">
-                                <div class="parking-spot empty" data-bs-toggle="tooltip" title="A-05: Boş. Rezervasyon için tıkla.">A-05</div>
-                            </div>
-                            <div class="col-3 col-md-2">
-                                <div class="parking-spot occupied" data-bs-toggle="tooltip" title="A-06: Dolu">A-06 <i class="fa-solid fa-car text-white-50 mt-1"></i></div>
-                            </div>
-                            <div class="col-3 col-md-2">
-                                <div class="parking-spot empty" data-bs-toggle="tooltip" title="A-07: Boş. Rezervasyon için tıkla.">A-07</div>
-                            </div>
-                            <div class="col-3 col-md-2">
-                                <div class="parking-spot empty" data-bs-toggle="tooltip" title="A-08: Boş. Rezervasyon için tıkla.">A-08</div>
-                            </div>
-                            <div class="col-3 col-md-2">
-                                <div class="parking-spot occupied" data-bs-toggle="tooltip" title="A-09: Dolu">A-09 <i class="fa-solid fa-car text-white-50 mt-1"></i></div>
-                            </div>
-                            <div class="col-3 col-md-2">
-                                <div class="parking-spot occupied" data-bs-toggle="tooltip" title="A-10: Dolu">A-10 <i class="fa-solid fa-car text-white-50 mt-1"></i></div>
-                            </div>
-                            <div class="col-3 col-md-2">
-                                <div class="parking-spot empty" data-bs-toggle="tooltip" title="A-11: Boş. Rezervasyon için tıkla.">A-11</div>
-                            </div>
-                            <div class="col-3 col-md-2">
-                                <div class="parking-spot empty" data-bs-toggle="tooltip" title="A-12: Boş. Rezervasyon için tıkla.">A-12</div>
-                            </div>
+                        <!-- İçi boşaltıldı, JS burayı dinamik dolduracak (ID eklendi) -->
+                        <div class="row g-3" id="parkingGridContainer">
                         </div>
                     </div>
                 </div>
@@ -184,7 +168,8 @@
                             <i class="fa-solid fa-satellite-dish fs-3"></i>
                         </div>
                         <h4 class="fw-bold mb-3">Anlık Takip</h4>
-                        <p class="text-muted">Sensörler ve kameralar aracılığıyla hangi alanın boş olduğunu harita üzerinden anlık saniye saniye takip edin.</p>
+                        <p class="text-muted">Sensörler ve kameralar aracılığıyla hangi alanın boş olduğunu harita
+                            üzerinden anlık saniye saniye takip edin.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -193,7 +178,8 @@
                             <i class="fa-solid fa-calendar-check fs-3"></i>
                         </div>
                         <h4 class="fw-bold mb-3">Hızlı Rezervasyon</h4>
-                        <p class="text-muted">Yola çıkmadan önce otoparkınızı ayırtın. Gittiğinizde yer bulamama sürprizi ile karşılaşmayın.</p>
+                        <p class="text-muted">Yola çıkmadan önce otoparkınızı ayırtın. Gittiğinizde yer bulamama
+                            sürprizi ile karşılaşmayın.</p>
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -202,7 +188,8 @@
                             <i class="fa-solid fa-qrcode fs-3"></i>
                         </div>
                         <h4 class="fw-bold mb-3">QR Kod ile Giriş</h4>
-                        <p class="text-muted">Rezervasyonunuz sonrası oluşan QR kodunuzu bariyerdeki okuyucuya göstererek saniyeler içinde giriş yapın.</p>
+                        <p class="text-muted">Rezervasyonunuz sonrası oluşan QR kodunuzu bariyerdeki okuyucuya
+                            göstererek saniyeler içinde giriş yapın.</p>
                     </div>
                 </div>
             </div>
@@ -217,13 +204,18 @@
                 <div class="col-lg-4 col-md-6 pe-lg-5">
                     <h4 class="fw-bold mb-3"><i class="fa-solid fa-square-parking text-primary me-2"></i>SENKRON</h4>
                     <p class="text-white-50 small mb-4">
-                        Şehir içi otopark arama sorununa yenilikçi, hızlı ve akıllı çözümler üreten yeni nesil otopark yönetim sistemi. Vakit kaybetmeyin, hayatla senkronize olun.
+                        Şehir içi otopark arama sorununa yenilikçi, hızlı ve akıllı çözümler üreten yeni nesil otopark
+                        yönetim sistemi. Vakit kaybetmeyin, hayatla senkronize olun.
                     </p>
                     <div class="d-flex gap-3">
-                        <a href="#" class="text-white-50 text-decoration-none fs-5 hover-primary"><i class="fa-brands fa-twitter"></i></a>
-                        <a href="#" class="text-white-50 text-decoration-none fs-5 hover-primary"><i class="fa-brands fa-facebook"></i></a>
-                        <a href="#" class="text-white-50 text-decoration-none fs-5 hover-primary"><i class="fa-brands fa-instagram"></i></a>
-                        <a href="#" class="text-white-50 text-decoration-none fs-5 hover-primary"><i class="fa-brands fa-linkedin"></i></a>
+                        <a href="#" class="text-white-50 text-decoration-none fs-5 hover-primary"><i
+                                class="fa-brands fa-twitter"></i></a>
+                        <a href="#" class="text-white-50 text-decoration-none fs-5 hover-primary"><i
+                                class="fa-brands fa-facebook"></i></a>
+                        <a href="#" class="text-white-50 text-decoration-none fs-5 hover-primary"><i
+                                class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="text-white-50 text-decoration-none fs-5 hover-primary"><i
+                                class="fa-brands fa-linkedin"></i></a>
                     </div>
                 </div>
 
@@ -231,10 +223,14 @@
                 <div class="col-lg-2 col-md-6">
                     <h5 class="fw-bold mb-3 pb-2 border-bottom border-secondary d-inline-block">Kurumsal</h5>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="pages/hakkimizda.html" class="text-white-50 text-decoration-none hover-white">Hakkımızda</a></li>
-                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white">Vizyon & Misyon</a></li>
-                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white">Sıkça Sorulan Sorular</a></li>
-                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white">KVKK Metni</a></li>
+                        <li class="mb-2"><a href="pages/hakkimizda.html"
+                                class="text-white-50 text-decoration-none hover-white">Hakkımızda</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white">Vizyon &
+                                Misyon</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white">Sıkça
+                                Sorulan Sorular</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white">KVKK
+                                Metni</a></li>
                     </ul>
                 </div>
 
@@ -242,10 +238,16 @@
                 <div class="col-lg-3 col-md-6">
                     <h5 class="fw-bold mb-3 pb-2 border-bottom border-secondary d-inline-block">Hızlı İşlemler</h5>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="pages/abone.html" class="text-white-50 text-decoration-none hover-white"><i class="fa-solid fa-angle-right text-primary me-2"></i>Abone Başvurusu</a></li>
-                        <li class="mb-2"><a href="#dashboard" class="text-white-50 text-decoration-none hover-white"><i class="fa-solid fa-angle-right text-primary me-2"></i>Canlı Otopark Durumu</a></li>
-                        <li class="mb-2"><a href="pages/login.html" class="text-white-50 text-decoration-none hover-white"><i class="fa-solid fa-angle-right text-primary me-2"></i>Üye Girişi</a></li>
-                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white"><i class="fa-solid fa-angle-right text-primary me-2"></i>Öneri ve Şikayet</a></li>
+                        <li class="mb-2"><a href="pages/abone.html"
+                                class="text-white-50 text-decoration-none hover-white"><i
+                                    class="fa-solid fa-angle-right text-primary me-2"></i>Abone Başvurusu</a></li>
+                        <li class="mb-2"><a href="#dashboard" class="text-white-50 text-decoration-none hover-white"><i
+                                    class="fa-solid fa-angle-right text-primary me-2"></i>Canlı Otopark Durumu</a></li>
+                        <li class="mb-2"><a href="pages/login.html"
+                                class="text-white-50 text-decoration-none hover-white"><i
+                                    class="fa-solid fa-angle-right text-primary me-2"></i>Üye Girişi</a></li>
+                        <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none hover-white"><i
+                                    class="fa-solid fa-angle-right text-primary me-2"></i>Öneri ve Şikayet</a></li>
                     </ul>
                 </div>
 
@@ -268,9 +270,9 @@
                     </ul>
                 </div>
             </div>
-            
+
             <hr class="border-secondary mb-3">
-            
+
             <!-- Alt Bilgi -->
             <div class="row align-items-center small text-white-50">
                 <div class="col-12 text-center">
@@ -286,4 +288,5 @@
     <!-- Custom JS -->
     <script src="js/main.js"></script>
 </body>
+
 </html>
