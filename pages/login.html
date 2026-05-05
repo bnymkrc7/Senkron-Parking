@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +16,7 @@
             align-items: center;
             color: #f8fafc;
         }
+
         .glass-card {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
@@ -22,6 +24,7 @@
             border-radius: 24px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
         }
+
         .form-control {
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -30,12 +33,14 @@
             padding: 12px;
             transition: all 0.3s;
         }
+
         .form-control:focus {
             background: rgba(255, 255, 255, 0.12);
             color: white;
             border-color: #38bdf8;
             box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
         }
+
         .btn-primary {
             background-color: #38bdf8;
             color: #0f172a;
@@ -46,13 +51,20 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
+
         .btn-primary:hover {
             background-color: #0ea5e9;
             transform: translateY(-2px);
         }
-        .brand-logo { font-weight: 800; letter-spacing: 3px; color: #38bdf8; }
+
+        .brand-logo {
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: #38bdf8;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="row justify-content-center">
@@ -79,7 +91,9 @@
 
                     <div class="text-center mt-4 pt-3 border-top border-secondary border-opacity-25">
                         <span class="text-secondary small">Henüz hesabınız yok mu?</span><br>
-                        <a href="register.html" class="text-info text-decoration-none small fw-bold mt-1 d-inline-block">Yeni kayıt oluştur →</a>
+                        <a href="register.html"
+                            class="text-info text-decoration-none small fw-bold mt-1 d-inline-block">Yeni kayıt oluştur
+                            →</a>
                     </div>
                 </div>
             </div>
@@ -87,7 +101,7 @@
     </div>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
+        document.getElementById('loginForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
             const email = document.getElementById('email').value.trim();
@@ -103,29 +117,31 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email, password })
             })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    return response.json().then(data => { throw new Error(data.error); });
-                }
-            })
-            .then(data => {
-                alert("Giriş başarılı! Hoş geldin, " + data.user.username);
-                
-                // Kullanıcı bilgisini tarayıcıya kaydet (Anasayfada kullanmak için)
-                localStorage.setItem('user', JSON.stringify(data.user));
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        return response.json().then(data => { throw new Error(data.error); });
+                    }
+                })
+                .then(data => {
+                    alert("Giriş başarılı! Hoş geldin, " + data.user.username);
 
-                // KRİTİK: Bir üst klasördeki (root) index.html'e yönlendirir
-                window.location.href = '../index.html'; 
-            })
-            .catch(err => {
-                alert("Hata: " + err.message);
-                loginBtn.disabled = false;
-                // Yazım hatası düzeltildi: "Giriş Yap Yap" -> "Giriş Yap"
-                loginBtn.innerText = "Giriş Yap";
-            });
+                    // Kullanıcı bilgisini tarayıcıya kaydet (Anasayfada kullanmak için)
+                    localStorage.setItem('user', JSON.stringify(data.user));
+
+                    // KRİTİK: Bir üst klasördeki (root) index.html'e yönlendirir
+                    localStorage.setItem('username', data.user.username);
+                    window.location.href = '../index.html';
+                })
+                .catch(err => {
+                    alert("Hata: " + err.message);
+                    loginBtn.disabled = false;
+                    // Yazım hatası düzeltildi: "Giriş Yap Yap" -> "Giriş Yap"
+                    loginBtn.innerText = "Giriş Yap";
+                });
         });
     </script>
 </body>
+
 </html>
