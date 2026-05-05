@@ -1,10 +1,34 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Bootstrap Tooltip'lerini başlatma fonksiyonu
+    // Mevcut tooltip kodun burada kalsın...
     function initTooltips() {
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
         [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
     }
+    initTooltips();
 
+   
+    const isim = localStorage.getItem('user_name'); // Giriş yapınca kaydedilen ismi al
+    const authArea = document.getElementById('userAuthArea'); // Navbar'daki o butonların olduğu yer
+
+    if (isim && authArea) {
+        // Eğer isim varsa Giriş/Kayıt butonlarını sil ve ismi yazdır
+        authArea.innerHTML = `
+            <div class="d-flex align-items-center bg-primary-subtle px-3 py-2 rounded-pill shadow-sm">
+                <i class="fa-solid fa-circle-user text-primary me-2 fs-5"></i>
+                <span class="fw-bold text-primary">Hoş geldin, ${isim}!</span>
+                <button class="btn btn-sm btn-link text-danger ms-2 text-decoration-none" onclick="logout()">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+        `;
+    }
+});
+
+// Çıkış yapınca ismi temizle ve sayfayı yenile
+function logout() {
+    localStorage.removeItem('user_name');
+    window.location.reload();
+}
     // Başlangıç otopark verisi
     const parkingSlots = [
         { id: 'A-01', status: 'empty' },
