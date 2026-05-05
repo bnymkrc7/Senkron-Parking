@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
         [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
     }
 
-    // Başlangıç otopark verisi (Mevcut HTML yapısına uygun)
+    // Başlangıç otopark verisi
     const parkingSlots = [
         { id: 'A-01', status: 'empty' },
         { id: 'A-02', status: 'occupied' },
@@ -24,90 +24,110 @@ document.addEventListener('DOMContentLoaded', () => {
     const gridContainer = document.querySelector('.parking-grid .row.g-3');
     const countDisplay = document.querySelector('.parking-grid .row.text-center .col-6.text-end');
 
-    // Otopark ızgarasını (Grid) dinamik olarak ekrana çizen fonksiyon
-    function renderSlots() {
-        if (!gridContainer) return;
+    // KULLANICI GİRİŞ KONTROLÜ 
+    const username = localStorage.getItem('username');
+    const userAuthArea = document.getElementById('userAuthArea');
 
-        // Önceki statik HTML içeriğini temizle
-        gridContainer.innerHTML = '';
-        let emptyCount = 0;
+    if (username && userAuthArea) {
+        userAuthArea.innerHTML = `
+            <span class="text-primary fw-bold me-3">
+                <i class="fa-solid fa-user me-1"></i> Hoş geldin, ${username}
+            </span>
+            <button class="btn btn-sm btn-outline-danger rounded-pill px-3" onclick="logout()">Çıkış Yap</button>
+        `;
+    }
 
-        parkingSlots.forEach(slot => {
-            let iconHtml = '';
-            let tooltipText = '';
+});
 
-            // Duruma göre ikon ve tooltip metni belirleme
-            if (slot.status === 'occupied') {
-                iconHtml = '<i class="fa-solid fa-car text-white-50 mt-1"></i>';
-                tooltipText = `${slot.id}: Dolu`;
-            } else if (slot.status === 'reserved') {
-                iconHtml = '<i class="fa-regular fa-clock text-dark mt-1"></i>';
-                tooltipText = `${slot.id}: Sizin rezervasyonunuz.`;
-            } else {
-                emptyCount++;
-                tooltipText = `${slot.id}: Boş. Rezervasyon için tıkla.`;
-            }
+//ÇIKIŞ FONKSİYONUNU:
+window.logout = function () {
+    localStorage.removeItem('username');
+    window.location.reload();
+};
+// Otopark ızgarasını (Grid) dinamik olarak ekrana çizen fonksiyon
+function renderSlots() {
+    if (!gridContainer) return;
 
-            // Yeni slot elementini oluşturma
-            const col = document.createElement('div');
-            col.className = 'col-3 col-md-2';
+    // Önceki statik HTML içeriğini temizle
+    gridContainer.innerHTML = '';
+    let emptyCount = 0;
 
-            col.innerHTML = `
+    parkingSlots.forEach(slot => {
+        let iconHtml = '';
+        let tooltipText = '';
+
+        // Duruma göre ikon ve tooltip metni belirleme
+        if (slot.status === 'occupied') {
+            iconHtml = '<i class="fa-solid fa-car text-white-50 mt-1"></i>';
+            tooltipText = `${slot.id}: Dolu`;
+        } else if (slot.status === 'reserved') {
+            iconHtml = '<i class="fa-regular fa-clock text-dark mt-1"></i>';
+            tooltipText = `${slot.id}: Sizin rezervasyonunuz.`;
+        } else {
+            emptyCount++;
+            tooltipText = `${slot.id}: Boş. Rezervasyon için tıkla.`;
+        }
+
+        // Yeni slot elementini oluşturma
+        const col = document.createElement('div');
+        col.className = 'col-3 col-md-2';
+
+        col.innerHTML = `
                 <div class="parking-spot ${slot.status}" style="cursor:pointer;" data-bs-toggle="tooltip" title="${tooltipText}" onclick="handleSlotClick('${slot.id}')">
                     ${slot.id} ${iconHtml}
                 </div>
             `;
-            gridContainer.appendChild(col);
-        });
+        gridContainer.appendChild(col);
+    });
 
-        // Toplam boş yer sayacını güncelleme
-        if (countDisplay) {
-            countDisplay.textContent = `${emptyCount} / ${parkingSlots.length} Boş`;
-        }
-
-        // DOM'a yeni eklenen elementler için tooltipleri tekrar aktif et
-        initTooltips();
+    // Toplam boş yer sayacını güncelleme
+    if (countDisplay) {
+        countDisplay.textContent = `${emptyCount} / ${parkingSlots.length} Boş`;
     }
 
-    // Tıklama ve Rezervasyon Yönetimi
-    window.handleSlotClick = function (id) {
-        const slotIndex = parkingSlots.findIndex(s => s.id === id);
-        if (slotIndex === -1) return;
+    // DOM'a yeni eklenen elementler için tooltipleri tekrar aktif et
+    initTooltips();
+}
 
-        const slot = parkingSlots[slotIndex];
+// Tıklama ve Rezervasyon Yönetimi
+window.handleSlotClick = function (id) {
+    const slotIndex = parkingSlots.findIndex(s => s.id === id);
+    if (slotIndex === -1) return;
 
-        if (slot.status === 'empty') {
-            if (confirm(`${id} numaralı otopark alanını rezerve etmek istiyor musunuz?`)) {
-                slot.status = 'reserved';
-                renderSlots();
-            }
-        } else if (slot.status === 'reserved') {
-            if (confirm(`Rezervasyonunuzu iptal etmek istiyor musunuz?`)) {
-                slot.status = 'empty';
-                renderSlots();
-            }
-        } else {
-            // Dolu bir alana tıklandığında uyarı ver
-            alert('Bu alan şu anda başka bir araç tarafından kullanılıyor.');
+    const slot = parkingSlots[slotIndex];
+
+    if (slot.status === 'empty') {
+        if (confirm(`${id} numaralı otopark alanını rezerve etmek istiyor musunuz?`)) {
+            slot.status = 'reserved';
+            renderSlots();
         }
-    };
-
-    // İlk yüklemede haritayı çiz
-    renderSlots();
-
-    // SİMÜLASYON MOTORU: Her 4 saniyede bir rastgele giriş/çıkış efekti
-    setInterval(() => {
-        const randomIndex = Math.floor(Math.random() * parkingSlots.length);
-        const slot = parkingSlots[randomIndex];
-
-        // Kullanıcının rezerve ettiği alana dokunmuyoruz
-        if (slot.status === 'empty') {
-            slot.status = 'occupied';
-        } else if (slot.status === 'occupied') {
+    } else if (slot.status === 'reserved') {
+        if (confirm(`Rezervasyonunuzu iptal etmek istiyor musunuz?`)) {
             slot.status = 'empty';
+            renderSlots();
         }
+    } else {
+        // Dolu bir alana tıklandığında uyarı ver
+        alert('Bu alan şu anda başka bir araç tarafından kullanılıyor.');
+    }
+};
 
-        // Değişikliği ekrana yansıt
-        renderSlots();
-    }, 4000);
+// İlk yüklemede haritayı çiz
+renderSlots();
+
+// SİMÜLASYON MOTORU: Her 4 saniyede bir rastgele giriş/çıkış efekti
+setInterval(() => {
+    const randomIndex = Math.floor(Math.random() * parkingSlots.length);
+    const slot = parkingSlots[randomIndex];
+
+    // Kullanıcının rezerve ettiği alana dokunmuyoruz
+    if (slot.status === 'empty') {
+        slot.status = 'occupied';
+    } else if (slot.status === 'occupied') {
+        slot.status = 'empty';
+    }
+
+    // Değişikliği ekrana yansıt
+    renderSlots();
+}, 4000);
 });
