@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senkron | Sıkça Sorulan Sorular</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .page-header {
+            padding-top: 140px;
+            padding-bottom: 60px;
+            background: linear-gradient(135deg, rgba(13,110,253,0.05) 0%, rgba(13,110,253,0.15) 100%);
+            margin-bottom: 60px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100 bg-light">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="../index.html">
+                <i class="fa-solid fa-square-parking text-primary me-2"></i>SENKRON
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="../index.html">Ana Sayfa</a></li>
+                    <li class="nav-item"><a class="nav-link" href="park-yerleri.html">Park Yerleri</a></li>
+                    <li class="nav-item"><a class="nav-link" href="abone.html">Abone Ol</a></li>
+                    <li class="nav-item"><a class="nav-link" href="hakkimizda.html">Hakkımızda</a></li>
+                    <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
+                        <a class="btn btn-outline-primary rounded-pill px-4 me-2" href="login.html">Giriş Yap</a>
+                        <a class="btn btn-primary rounded-pill px-4 shadow-sm" href="register.html">Kayıt Ol</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="container">
+            <h1 class="display-4 fw-bold mb-3">Sıkça Sorulan Sorular</h1>
+            <p class="lead text-muted mx-auto" style="max-width: 700px;">
+                Senkron Akıllı Otopark Sistemi ile ilgili merak ettiğiniz tüm soruların cevapları burada.
+            </p>
+        </div>
+    </div>
+
+    <div class="container mb-5 flex-grow-1">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="accordion shadow-sm" id="accordionFAQ">
+                    <div class="accordion-item border-0 mb-3 rounded-3 overflow-hidden">
+                        <h2 class="accordion-header" id="headingOne">
+                            <button class="accordion-button fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                Nasıl abone olabilirim?
+                            </button>
+                        </h2>
+                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionFAQ">
+                            <div class="accordion-body text-muted">
+                                Abone olmak için ana sayfamızda veya üst menüde yer alan "Abone Ol" butonuna tıklayarak başvuru formunu doldurabilirsiniz. Kaydınız onaylandıktan sonra QR kodunuz ile otoparklarımızı abonelik kapsamında kullanabilirsiniz.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item border-0 mb-3 rounded-3 overflow-hidden">
+                        <h2 class="accordion-header" id="headingTwo">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                Otopark ücretleri ne kadar?
+                            </button>
+                        </h2>
+                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionFAQ">
+                            <div class="accordion-body text-muted">
+                                Otopark ücretlerimiz lokasyona göre değişiklik göstermekle birlikte, standart saatlik ücretimiz 20 TL'dir. Abonelerimiz için özel indirimli aylık paketlerimiz bulunmaktadır.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item border-0 mb-3 rounded-3 overflow-hidden">
+                        <h2 class="accordion-header" id="headingThree">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                Engelli park yerlerinden nasıl faydalanabilirim?
+                            </button>
+                        </h2>
+                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionFAQ">
+                            <div class="accordion-body text-muted">
+                                Engelli park yerlerinden ücretsiz faydalanmak için "Abone Ol" sayfasından başvuru yaparken araç ruhsatı ve engelli kimlik kartınızı sisteme yüklemeniz yeterlidir. Onay sonrası sistem sizi otomatik tanıyacaktır.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item border-0 mb-3 rounded-3 overflow-hidden">
+                        <h2 class="accordion-header" id="headingFour">
+                            <button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                QR Kod ile nasıl giriş yaparım?
+                            </button>
+                        </h2>
+                        <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionFAQ">
+                            <div class="accordion-body text-muted">
+                                Üye girişi yaptıktan sonra panelinizde bulunan QR kodunuzu otopark girişindeki okuyucuya okutarak bariyerin saniyeler içinde açılmasını sağlayabilirsiniz.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white pt-5 pb-3 mt-auto border-top border-primary border-4">
+        <div class="container">
+            <div class="row gy-4 mb-4">
+                <div class="col-lg-4 col-md-6 pe-lg-5">
+                    <h4 class="fw-bold mb-3"><i class="fa-solid fa-square-parking text-primary me-2"></i>SENKRON</h4>
+                    <p class="text-white-50 small mb-4">Şehir içi otopark arama sorununa yenilikçi, hızlı ve akıllı çözümler üreten yeni nesil otopark yönetim sistemi.</p>
+                </div>
+                <div class="col-lg-2 col-md-6">
+                    <h5 class="fw-bold mb-3 pb-2 border-bottom border-secondary d-inline-block">Kurumsal</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="hakkimizda.html" class="text-white-50 text-decoration-none hover-white">Hakkımızda</a></li>
+                        <li class="mb-2"><a href="vizyon-misyon.html" class="text-white-50 text-decoration-none hover-white">Vizyon & Misyon</a></li>
+                        <li class="mb-2"><a href="sss.html" class="text-white-50 text-decoration-none hover-white">Sıkça Sorulan Sorular</a></li>
+                        <li class="mb-2"><a href="kvkk.html" class="text-white-50 text-decoration-none hover-white">KVKK Metni</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="fw-bold mb-3 pb-2 border-bottom border-secondary d-inline-block">Hızlı İşlemler</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="abone.html" class="text-white-50 text-decoration-none hover-white"><i class="fa-solid fa-angle-right text-primary me-2"></i>Abone Başvurusu</a></li>
+                        <li class="mb-2"><a href="../index.html#dashboard" class="text-white-50 text-decoration-none hover-white"><i class="fa-solid fa-angle-right text-primary me-2"></i>Canlı Otopark Durumu</a></li>
+                        <li class="mb-2"><a href="login.html" class="text-white-50 text-decoration-none hover-white"><i class="fa-solid fa-angle-right text-primary me-2"></i>Üye Girişi</a></li>
+                        <li class="mb-2"><a href="oneri-sikayet.html" class="text-white-50 text-decoration-none hover-white"><i class="fa-solid fa-angle-right text-primary me-2"></i>Öneri ve Şikayet</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <h5 class="fw-bold mb-3 pb-2 border-bottom border-secondary d-inline-block">İletişim</h5>
+                    <ul class="list-unstyled text-white-50 small">
+                        <li class="mb-3 d-flex"><i class="fa-solid fa-location-dot mt-1 me-3 text-primary"></i><span>Kadıköy / İstanbul</span></li>
+                        <li class="mb-3 d-flex align-items-center"><i class="fa-solid fa-phone me-3 text-primary"></i><span>0 (850) 123 45 67</span></li>
+                        <li class="d-flex align-items-center"><i class="fa-solid fa-envelope me-3 text-primary"></i><span>destek@senkronparking.com</span></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="border-secondary mb-3">
+            <div class="row align-items-center small text-white-50"><div class="col-12 text-center">&copy; 2026 Senkron Akıllı Otopark Sistemleri. Tüm hakları saklıdır.</div></div>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
