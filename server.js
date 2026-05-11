@@ -67,17 +67,73 @@ app.get('/api/parking-slots', (req, res) => {
 });
 
 
-app.patch('/api/parking-slots/:id', (req, res) => {
-    const { is_occupied } = req.body; // 1 (dolu) veya 0 (boş) gelecek
-    const { id } = req.params;
+app.patch('/api/parking-slots/:slot_number', (req, res) => {
+    const { status } = req.body; // 'empty', 'occupied', 'reserved'
+    const { slot_number } = req.params;
 
-    const query = `UPDATE parking_slots SET is_occupied = ? WHERE id = ?`;
+    const query = `UPDATE parking_slots SET status = ? WHERE slot_number = ?`;
     
-    db.run(query, [is_occupied, id], function(err) {
+    db.run(query, [status, slot_number], function(err) {
         if (err) {
             return res.status(500).json({ error: "Güncelleme başarısız." });
         }
         res.status(200).json({ message: "Park yeri durumu güncellendi!" });
+    });
+});
+app.post('/api/reservations', (req, res) => {
+    const { username, slot_number, plate_number, arrival_time } = req.body;
+
+    if (!username || !slot_number || !plate_number || !arrival_time) {
+        return res.status(400).json({ error: "Lütfen tüm alanları doldurun." });
+    }
+
+    const insertQuery = `INSERT INTO reservations (username, slot_number, plate_number, arrival_time) VALUES (?, ?, ?, ?)`;
+    const updateQuery = `UPDATE parking_slots SET status = 'reserved' WHERE slot_number = ?`;
+
+    db.serialize(() => {
+        db.run(insertQuery, [username, slot_number, plate_number, arrival_time], function(err) {
+            if (err) {
+                return res.status(500).json({ error: "Rezervasyon kaydedilemedi." });
+            }
+            
+            db.run(updateQuery, [slot_number], function(err) {
+                if (err) {
+                    return res.status(500).json({ error: "Otopark durumu güncellenemedi." });
+                }
+                res.status(201).json({ message: "Rezervasyon başarıyla oluşturuldu." });
+            });
+        });
+    });
+});
+app.get('/api/reservations/:username', (req, res) => {
+    const { username } = req.params;
+    const query = `SELECT * FROM reservations WHERE username = ? ORDER BY created_at DESC`;
+    
+    db.all(query, [username], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: "Rezervasyonlar alınamadı." });
+        }
+        res.status(200).json(rows);
+    });
+});
+app.delete('/api/reservations/:id', (req, res) => {
+    const { id } = req.params;
+    
+    db.get(`SELECT slot_number FROM reservations WHERE id = ?`, [id], (err, row) => {
+        if (err || !row) return res.status(404).json({ error: "Rezervasyon bulunamadı." });
+        
+        const slot_number = row.slot_number;
+        
+        db.serialize(() => {
+            db.run(`DELETE FROM reservations WHERE id = ?`, [id], function(err) {
+                if (err) return res.status(500).json({ error: "İptal başarısız oldu." });
+                
+                db.run(`UPDATE parking_slots SET status = 'empty' WHERE slot_number = ?`, [slot_number], function(err) {
+                    if (err) return res.status(500).json({ error: "Otopark durumu güncellenemedi." });
+                    res.status(200).json({ message: "Rezervasyon iptal edildi ve alan boşaltıldı." });
+                });
+            });
+        });
     });
 });
 

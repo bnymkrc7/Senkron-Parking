@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Senkron | KVKK Metni</title>
+    <title>Rezervasyonlarım | Senkron</title>
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="../css/style.css">
-    <style>
-        .page-header {
-            padding-top: 140px;
-            padding-bottom: 60px;
-            background: linear-gradient(135deg, rgba(13,110,253,0.05) 0%, rgba(13,110,253,0.15) 100%);
-            margin-bottom: 60px;
-            text-align: center;
-        }
-    </style>
 </head>
-<body class="d-flex flex-column min-vh-100 bg-light">
+<body class="d-flex flex-column min-vh-100">
+
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-white shadow-sm">
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top glass-navbar">
         <div class="container">
             <a class="navbar-brand fw-bold" href="../index.html">
                 <i class="fa-solid fa-square-parking text-primary me-2"></i>SENKRON
@@ -45,35 +45,27 @@
         </div>
     </nav>
 
-    <div class="page-header">
-        <div class="container">
-            <h1 class="display-4 fw-bold mb-3">Kişisel Verilerin Korunması (KVKK)</h1>
-            
-        </div>
-    </div>
-
-    
-    <div class="container mb-5 flex-grow-1">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5">
-                    
-    <h4 class="fw-bold mb-3">1. Veri Sorumlusu</h4>
-    <p class="text-muted mb-4">Senkron Akıllı Otopark Sistemleri olarak, kişisel verilerinizin güvenliğine önem veriyoruz. 6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") uyarınca veri sorumlusu sıfatıyla hareket etmekteyiz.</p>
-    
-    <h4 class="fw-bold mb-3">2. İşlenen Kişisel Verileriniz</h4>
-    <p class="text-muted mb-4">Ad, soyad, plaka bilgisi, iletişim bilgileri ve lokasyon verileriniz hizmetin sağlanabilmesi amacıyla işlenmektedir.</p>
-    
-    <h4 class="fw-bold mb-3">3. Kişisel Verilerin İşlenme Amacı</h4>
-    <p class="text-muted mb-4">Verileriniz; otopark giriş-çıkış işlemlerinin yönetilmesi, rezervasyonların oluşturulması ve yasal yükümlülüklerimizin yerine getirilmesi amacıyla işlenmektedir.</p>
-
+    <!-- Main Content -->
+    <main class="flex-grow-1 pt-5 mt-5">
+        <div class="container py-5">
+            <div class="row mb-5 text-center">
+                <div class="col-12">
+                    <h1 class="display-5 fw-bold mb-3"><span class="text-primary">Geçmiş</span> Rezervasyonlarım</h1>
+                    <p class="text-muted lead mx-auto" style="max-width: 600px;">Bugüne kadar Senkron üzerinden yaptığınız tüm otopark rezervasyon işlemleriniz aşağıda listelenmektedir.</p>
                 </div>
             </div>
-        </div>
-    </div>
+
+            <!-- Rezervasyon Listesi Container -->
+            <div class="row" id="reservationsContainer">
+                <div class="col-12 text-center" id="loadingSpinner">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Yükleniyor...</span>
+                    </div>
+                </div>
+                <!-- Kartlar js/reservations.js tarafından buraya eklenecek -->
             </div>
         </div>
-    </div>
+    </main>
 
     <!-- Footer -->
     <footer class="bg-dark text-white pt-5 pb-3 mt-auto border-top border-primary border-4">
@@ -87,34 +79,35 @@
                     <h5 class="fw-bold mb-3 pb-2 border-bottom border-secondary d-inline-block">Kurumsal</h5>
                     <ul class="list-unstyled">
                         <li class="mb-2"><a href="hakkimizda.html" class="text-white-50 text-decoration-none hover-white">Hakkımızda</a></li>
-                        <li class="mb-2"><a href="vizyon-misyon.html" class="text-white-50 text-decoration-none hover-white">Vizyon & Misyon</a></li>
-                        <li class="mb-2"><a href="sss.html" class="text-white-50 text-decoration-none hover-white">Sıkça Sorulan Sorular</a></li>
-                        <li class="mb-2"><a href="kvkk.html" class="text-white-50 text-decoration-none hover-white">KVKK Metni</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h5 class="fw-bold mb-3 pb-2 border-bottom border-secondary d-inline-block">Hızlı İşlemler</h5>
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="abone.html" class="text-white-50 text-decoration-none hover-white"><i class="fa-solid fa-angle-right text-primary me-2"></i>Abone Başvurusu</a></li>
-                        <li class="mb-2"><a href="../index.html#dashboard" class="text-white-50 text-decoration-none hover-white"><i class="fa-solid fa-angle-right text-primary me-2"></i>Canlı Otopark Durumu</a></li>
-                        <li class="mb-2"><a href="login.html" class="text-white-50 text-decoration-none hover-white"><i class="fa-solid fa-angle-right text-primary me-2"></i>Üye Girişi</a></li>
-                        <li class="mb-2"><a href="oneri-sikayet.html" class="text-white-50 text-decoration-none hover-white"><i class="fa-solid fa-angle-right text-primary me-2"></i>Öneri ve Şikayet</a></li>
+                        <li class="mb-2"><a href="abone.html" class="text-white-50 text-decoration-none hover-white">Abone Başvurusu</a></li>
+                        <li class="mb-2"><a href="park-yerleri.html" class="text-white-50 text-decoration-none hover-white">Canlı Otopark Durumu</a></li>
                     </ul>
                 </div>
                 <div class="col-lg-3 col-md-6">
                     <h5 class="fw-bold mb-3 pb-2 border-bottom border-secondary d-inline-block">İletişim</h5>
                     <ul class="list-unstyled text-white-50 small">
-                        <li class="mb-3 d-flex"><i class="fa-solid fa-location-dot mt-1 me-3 text-primary"></i><span>Kadıköy / İstanbul</span></li>
-                        <li class="mb-3 d-flex align-items-center"><i class="fa-solid fa-phone me-3 text-primary"></i><span>0 (850) 123 45 67</span></li>
-                        <li class="d-flex align-items-center"><i class="fa-solid fa-envelope me-3 text-primary"></i><span>destek@senkronparking.com</span></li>
+                        <li class="mb-3 d-flex">
+                            <i class="fa-solid fa-envelope me-3 text-primary"></i>
+                            <span>destek@senkronparking.com</span>
+                        </li>
                     </ul>
                 </div>
             </div>
             <hr class="border-secondary mb-3">
-            <div class="row align-items-center small text-white-50"><div class="col-12 text-center">&copy; 2026 Senkron Akıllı Otopark Sistemleri. Tüm hakları saklıdır.</div></div>
+            <div class="row align-items-center small text-white-50">
+                <div class="col-12 text-center">&copy; 2026 Senkron Akıllı Otopark Sistemleri. Tüm hakları saklıdır.</div>
+            </div>
         </div>
     </footer>
+
+    <!-- Bootstrap & JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script src="../js/auth.js?v=2"></script>
+    <script src="../js/auth.js?v=2"></script>
+    <script src="../js/reservations.js?v=1"></script>
 </body>
 </html>
