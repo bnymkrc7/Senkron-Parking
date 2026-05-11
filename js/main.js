@@ -1,16 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Mevcut tooltip kodun burada kalsın...
+    // Tooltip ayarları
     function initTooltips() {
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
         [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
     }
     initTooltips();
 
-    const isim = localStorage.getItem('user_name'); // Giriş yapınca kaydedilen ismi al
-    const authArea = document.getElementById('userAuthArea'); // Navbar'daki o butonların olduğu yer
+    const isim = localStorage.getItem('user_name'); 
+    const authArea = document.getElementById('userAuthArea'); 
 
     if (isim && authArea) {
-        // Eğer isim varsa Giriş/Kayıt butonlarını sil ve ismi yazdır
         authArea.innerHTML = `
             <div class="d-flex align-items-center bg-primary-subtle px-3 py-2 rounded-pill shadow-sm">
                 <i class="fa-solid fa-circle-user text-primary me-2 fs-5"></i>
@@ -58,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderSlots() {
         if (!gridContainer) return;
 
-        // Önceki statik HTML içeriğini temizle
         gridContainer.innerHTML = '';
         let emptyCount = 0;
 
@@ -66,7 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
             let iconHtml = '';
             let tooltipText = '';
 
-            // Duruma göre ikon ve tooltip metni belirleme
             if (slot.status === 'occupied') {
                 iconHtml = '<i class="fa-solid fa-car text-white-50 mt-1"></i>';
                 tooltipText = `${slot.id}: Dolu`;
@@ -78,7 +75,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 tooltipText = `${slot.id}: Boş. Rezervasyon için tıkla.`;
             }
 
-            // Yeni slot elementini oluşturma
             const col = document.createElement('div');
             col.className = 'col-3 col-md-2';
 
@@ -90,59 +86,81 @@ document.addEventListener('DOMContentLoaded', () => {
             gridContainer.appendChild(col);
         });
 
-        // Toplam boş yer sayacını güncelleme
         if (countDisplay) {
             countDisplay.textContent = `${emptyCount} / ${parkingSlots.length} Boş`;
         }
 
-        // DOM'a yeni eklenen elementler için tooltipleri tekrar aktif et
         initTooltips();
     }
 
-    // Tıklama ve Rezervasyon Yönetimi
-    window.handleSlotClick = function (id) {
+    // FRONTEND 2 GÖREVİ: Tıklama ve Rezervasyon İstek Yönetimi
+    window.handleSlotClick = async function (id) {
         const slotIndex = parkingSlots.findIndex(s => s.id === id);
         if (slotIndex === -1) return;
 
         const slot = parkingSlots[slotIndex];
+        const currentUser = localStorage.getItem('username') || localStorage.getItem('user_name');
 
         if (slot.status === 'empty') {
+            
+            if (!currentUser) {
+                alert("Rezervasyon yapmak için önce giriş yapmalısınız!");
+                window.location.href = "pages/login.html";
+                return;
+            }
+
             if (confirm(`${id} numaralı otopark alanını rezerve etmek istiyor musunuz?`)) {
-                slot.status = 'reserved';
-                renderSlots();
+                try {
+                    // BACKEND GELİŞTİRİCİSİ İÇİN NOT: 
+                    // API rotası hazır olduğunda aşağıdaki fetch bloğunu aktif edip URL'yi güncelleyin.
+                    /* 
+                    const response = await fetch('http://localhost:3000/api/rezervasyon', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ parkId: id, kullanici: currentUser })
+                    });
+                    
+                    if (!response.ok) throw new Error('Sunucu cevap vermedi');
+                    const data = await response.json();
+                    */
+
+                    // API'den "başarılı" cevabı geldiğinde arayüz güncellenir:
+                    slot.status = 'reserved';
+                    renderSlots();
+                    alert(`${id} numaralı alan başarıyla rezerve edildi!`);
+
+                } catch (error) {
+                    alert('Rezervasyon yapılırken bir hata oluştu: ' + error.message);
+                }
             }
         } else if (slot.status === 'reserved') {
             if (confirm(`Rezervasyonunuzu iptal etmek istiyor musunuz?`)) {
+                // BACKEND İÇİN: İptal fetch isteği buraya eklenebilir.
                 slot.status = 'empty';
                 renderSlots();
             }
         } else {
-            // Dolu bir alana tıklandığında uyarı ver
             alert('Bu alan şu anda başka bir araç tarafından kullanılıyor.');
         }
     };
 
-    // İlk yüklemede haritayı çiz
     renderSlots();
 
-    // SİMÜLASYON MOTORU: Her 4 saniyede bir rastgele giriş/çıkış efekti
+    // SİMÜLASYON MOTORU
     setInterval(() => {
         const randomIndex = Math.floor(Math.random() * parkingSlots.length);
         const slot = parkingSlots[randomIndex];
 
-        // Kullanıcının rezerve ettiği alana dokunmuyoruz
         if (slot.status === 'empty') {
             slot.status = 'occupied';
         } else if (slot.status === 'occupied') {
             slot.status = 'empty';
         }
 
-        // Değişikliği ekrana yansıt
         renderSlots();
     }, 4000);
 });
 
-// ÇIKIŞ FONKSİYONUNU:
 window.logout = function () {
     localStorage.removeItem('user_name');
     localStorage.removeItem('username');
