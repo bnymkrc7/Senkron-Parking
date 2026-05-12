@@ -71,9 +71,10 @@ app.patch('/api/parking-slots/:id', (req, res) => {
     const { is_occupied } = req.body; // 1 (dolu) veya 0 (boş) gelecek
     const { id } = req.params;
 
-    const query = `UPDATE parking_slots SET is_occupied = ? WHERE id = ?`;
+    const newStatus = is_occupied == 1 ? 'occupied' : 'empty';
+    const query = `UPDATE parking_slots SET status = ? WHERE id = ?`;
     
-    db.run(query, [is_occupied, id], function(err) {
+    db.run(query, [newStatus, id], function(err) {
         if (err) {
             return res.status(500).json({ error: "Güncelleme başarısız." });
         }
@@ -102,28 +103,72 @@ app.patch('/api/user/update-plate', (req, res) => {
     });
 });
 
-// Kullanıcı bir yeri rezerve ettiğinde hem slotu günceller hem de kayıt tutar
-app.post('/api/reserve', (req, res) => {
-    const { userId, slotId } = req.body;
+// --- REZERVASYON İŞLEMLERİ ---
 
-    if (!userId || !slotId) {
-        return res.status(400).json({ error: "Eksik bilgi: Kullanıcı veya Slot ID bulunamadı." });
+// 1. Kullanıcının rezervasyonlarını getir
+app.get('/api/reservations/:username', (req, res) => {
+    const { username } = req.params;
+    const query = `SELECT * FROM reservations WHERE username = ? ORDER BY created_at DESC`;
+    
+    db.all(query, [username], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: "Rezervasyonlar alınamadı." });
+        }
+        res.status(200).json(rows);
+    });
+});
+
+// 2. Yeni rezervasyon oluştur
+app.post('/api/reservations', (req, res) => {
+    const { username, slot_number, plate_number, arrival_time } = req.body;
+
+    if (!username || !slot_number || !plate_number || !arrival_time) {
+        return res.status(400).json({ error: "Eksik bilgi." });
     }
 
-   
-    const updateSlotQuery = `UPDATE parking_slots SET is_occupied = 1 WHERE id = ? AND is_occupied = 0`;
+    const insertQuery = `INSERT INTO reservations (username, slot_number, plate_number, arrival_time) VALUES (?, ?, ?, ?)`;
+    const updateSlotQuery = `UPDATE parking_slots SET status = 'reserved' WHERE slot_number = ? AND status = 'empty'`;
 
-    db.run(updateSlotQuery, [slotId], function(err) {
+    // Önce otopark yerinin durumunu rezerve yap
+    db.run(updateSlotQuery, [slot_number], function(err) {
         if (err) {
-            return res.status(500).json({ error: "Rezervasyon işlemi başarısız." });
+            return res.status(500).json({ error: "Otopark durumu güncellenemedi." });
         }
         if (this.changes === 0) {
-            return res.status(400).json({ error: "Bu yer zaten rezerve edilmiş veya bulunamadı." });
+            return res.status(400).json({ error: "Bu yer zaten dolu veya rezerve." });
         }
 
-        res.status(200).json({ 
-            message: "Rezervasyon başarıyla tamamlandı!",
-            slotId: slotId 
+        // Yer başarılı şekilde rezerve edildikten sonra kaydı oluştur
+        db.run(insertQuery, [username, slot_number, plate_number, arrival_time], function(err) {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: "Rezervasyon kaydedilemedi." });
+            }
+            res.status(201).json({ message: "Rezervasyon başarıyla tamamlandı!" });
+        });
+    });
+});
+
+// 3. Rezervasyon iptal et
+app.delete('/api/reservations/:id', (req, res) => {
+    const { id } = req.params;
+
+    // Önce rezervasyondan slot_number'ı bul
+    db.get(`SELECT slot_number FROM reservations WHERE id = ?`, [id], (err, row) => {
+        if (err || !row) {
+            return res.status(404).json({ error: "Rezervasyon bulunamadı." });
+        }
+        
+        const slot_number = row.slot_number;
+
+        // Rezervasyonu sil
+        db.run(`DELETE FROM reservations WHERE id = ?`, [id], function(err) {
+            if (err) return res.status(500).json({ error: "Rezervasyon silinemedi." });
+
+            // Alanı tekrar boş yap
+            db.run(`UPDATE parking_slots SET status = 'empty' WHERE slot_number = ?`, [slot_number], function(err) {
+                res.status(200).json({ message: "Rezervasyon başarıyla iptal edildi." });
+            });
         });
     });
 });
