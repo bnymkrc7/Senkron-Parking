@@ -103,7 +103,18 @@
 
                             <div class="mb-4">
                                 <label class="form-label small text-uppercase text-secondary fw-bold">Şifre</label>
-                                <input type="password" class="form-control" id="sifre" placeholder="••••••••" disabled required>
+                                <div class="position-relative">
+                                    <input type="password" class="form-control" id="sifre" placeholder="••••••••" disabled required style="padding-right: 70px;">
+                                    <button type="button" id="toggleSifre" class="btn position-absolute top-50 end-0 translate-middle-y text-info fw-bold" style="background: transparent; border: none; box-shadow: none; font-size: 0.85rem; padding-right: 15px;">Göster</button>
+                                </div>
+                                <div id="capsWarningRegister" class="text-warning small mt-1 d-none" style="font-size: 0.75rem;">
+                                    ⚠️ Uyarı: Caps Lock Açık!
+                                </div>
+                                <div class="progress mt-2 d-none" id="strengthProgress" style="height: 5px; background: rgba(255,255,255,0.08);">
+                                    <div class="progress-bar" id="strengthBar" role="progressbar" style="width: 0%; transition: all 0.3s;"></div>
+                                </div>
+                                <div id="strengthText" class="small mt-1" style="font-size: 0.75rem;"></div>
+
                                 <div id="passwordHelp" class="form-text text-secondary opacity-75 mt-2" style="font-size: 0.75rem;">
                                     * Şifreniz en az 8 karakter, 1 büyük harf ve 1 rakam içermelidir.
                                 </div>
@@ -123,7 +134,7 @@
     </div>
 
     <script>
-        // --- 1. GÖRSEL MANTIK: INPUTLARIN SIRAYLA AÇILMASI (DEĞİŞTİRİLMEDİ) ---
+        // --- 1. INPUTLARIN SIRAYLA AÇILMASI VE PLAKA BÜYÜK HARF (ÖNERİ 4) ---
         const fields = [
             document.getElementById('ad'),
             document.getElementById('soyad'),
@@ -136,6 +147,11 @@
         fields.forEach((el, index) => {
             if(index < fields.length - 1) {
                 el.addEventListener('input', () => {
+                    // ÖNERİ 4: Plaka girilirken anlık otomatik büyük harfe çevirme
+                    if(el.id === 'plaka') {
+                        el.value = el.value.toUpperCase();
+                    }
+
                     const nextEl = fields[index + 1];
                     let isValid = el.value.trim().length >= 2;
                     
@@ -150,12 +166,67 @@
                             fields[i].disabled = true;
                             if(fields[i].tagName === "INPUT") fields[i].value = "";
                         }
+                        if(el.id === 'plaka') {
+                            document.getElementById('strengthProgress').classList.add('d-none');
+                            document.getElementById('strengthText').innerText = '';
+                        }
                     }
                 });
             }
         });
 
-        // --- 2. BACKEND BAĞLANTISI VE YÖNLENDİRME (GÜNCELLENDİ) ---
+        // --- ÖNERİ 2: ŞİFRE GÜÇLÜLÜK KONTROLÜ ---
+        const sifreInput = document.getElementById('sifre');
+        const strengthProgress = document.getElementById('strengthProgress');
+        const strengthBar = document.getElementById('strengthBar');
+        const strengthText = document.getElementById('strengthText');
+
+        sifreInput.addEventListener('input', () => {
+            const val = sifreInput.value;
+            if (val.length > 0) {
+                strengthProgress.classList.remove('d-none');
+            } else {
+                strengthProgress.classList.add('d-none');
+                strengthText.innerText = '';
+                return;
+            }
+
+            let passed = 0;
+            if (val.length >= 8) passed++;
+            if (/[A-Z]/.test(val)) passed++;
+            if (/\d/.test(val)) passed++;
+
+            if (passed === 1) {
+                strengthBar.style.width = '33%';
+                strengthBar.className = 'progress-bar bg-danger';
+                strengthText.innerText = 'Zayıf Şifre';
+                strengthText.className = 'small text-danger mt-1';
+            } else if (passed === 2) {
+                strengthBar.style.width = '66%';
+                strengthBar.className = 'progress-bar bg-warning';
+                strengthText.innerText = 'Orta Derece';
+                strengthText.className = 'small text-warning mt-1';
+            } else if (passed === 3) {
+                strengthBar.style.width = '100%';
+                strengthBar.className = 'progress-bar bg-success';
+                strengthText.innerText = 'Güçlü Şifre (Kurallara Uygun)';
+                strengthText.className = 'small text-success mt-1';
+            }
+        });
+
+        // --- ÖNERİ 3: REGISTER CAPS LOCK TAKİBİ ---
+        function checkRegisterCapsLock(e) {
+            const capsWarning = document.getElementById('capsWarningRegister');
+            if (e.getModifierState('CapsLock')) {
+                capsWarning.classList.remove('d-none');
+            } else {
+                capsWarning.classList.add('d-none');
+            }
+        }
+        sifreInput.addEventListener('keyup', checkRegisterCapsLock);
+        sifreInput.addEventListener('keydown', checkRegisterCapsLock);
+
+        // --- BACKEND BAĞLANTISI VE YÖNLENDİRME ---
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -165,13 +236,11 @@
             const plate_number = document.getElementById('plaka').value.trim();
             const password = document.getElementById('sifre').value.trim();
 
-            // --- YENİ EKLENEN KISIM: ŞİFRE KONTROLÜ ---
             const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
             if (!passwordRegex.test(password)) {
                 alert("Lütfen şifrenizin en az 8 karakter, 1 büyük harf ve 1 rakam içerdiğinden emin olun.");
-                return; // Kurallara uymazsa işlemi durdurur, backend'e gitmez.
+                return;
             }
-            // ------------------------------------------
 
             const username = ad + " " + soyad;
             const regBtn = document.getElementById('regBtn');
@@ -201,6 +270,16 @@
                 regBtn.disabled = false;
                 regBtn.innerText = "Kayıt İşlemini Tamamla";
             });
+        });
+
+        // --- ŞİFRE GÖSTER/GİZLE İŞLEMİ (REGISTER) ---
+        document.getElementById('toggleSifre').addEventListener('click', function () {
+            const sifreInput = document.getElementById('sifre');
+            if (sifreInput.disabled) return; 
+            
+            const type = sifreInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            sifreInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? 'Göster' : 'Gizle';
         });
     </script>
 <script src="../js/auth.js?v=2"></script>
