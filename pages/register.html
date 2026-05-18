@@ -104,6 +104,9 @@
                             <div class="mb-4">
                                 <label class="form-label small text-uppercase text-secondary fw-bold">Şifre</label>
                                 <input type="password" class="form-control" id="sifre" placeholder="••••••••" disabled required>
+                                <div id="passwordHelp" class="form-text text-secondary opacity-75 mt-2" style="font-size: 0.75rem;">
+                                    * Şifreniz en az 8 karakter, 1 büyük harf ve 1 rakam içermelidir.
+                                </div>
                             </div>
 
                             <button type="submit" id="regBtn" class="btn btn-primary w-100" disabled>Kayıt İşlemini Tamamla</button>
@@ -120,7 +123,7 @@
     </div>
 
     <script>
-        // --- 1. GÖRSEL MANTIK: INPUTLARIN SIRAYLA AÇILMASI ---
+        // --- 1. GÖRSEL MANTIK: INPUTLARIN SIRAYLA AÇILMASI (DEĞİŞTİRİLMEDİ) ---
         const fields = [
             document.getElementById('ad'),
             document.getElementById('soyad'),
@@ -152,7 +155,7 @@
             }
         });
 
-        // --- 2. BACKEND BAĞLANTISI VE YÖNLENDİRME ---
+        // --- 2. BACKEND BAĞLANTISI VE YÖNLENDİRME (GÜNCELLENDİ) ---
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -161,6 +164,14 @@
             const email = document.getElementById('mail').value.trim();
             const plate_number = document.getElementById('plaka').value.trim();
             const password = document.getElementById('sifre').value.trim();
+
+            // --- YENİ EKLENEN KISIM: ŞİFRE KONTROLÜ ---
+            const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+            if (!passwordRegex.test(password)) {
+                alert("Lütfen şifrenizin en az 8 karakter, 1 büyük harf ve 1 rakam içerdiğinden emin olun.");
+                return; // Kurallara uymazsa işlemi durdurur, backend'e gitmez.
+            }
+            // ------------------------------------------
 
             const username = ad + " " + soyad;
             const regBtn = document.getElementById('regBtn');
@@ -176,7 +187,6 @@
             .then(response => {
                 if(response.status === 201) {
                     alert("Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz.");
-                    // Önce giriş sayfasına gönderelim ki kullanıcı giriş yapabilsin
                     window.location.href = 'login.html'; 
                 } else {
                     return response.json().then(data => {
