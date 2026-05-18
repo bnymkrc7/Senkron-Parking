@@ -83,4 +83,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Her 5 saniyede bir durumu güncelle (Gerçek zamanlı görünmesi için)
     setInterval(fetchParkingSlots, 5000);
 });
-
+

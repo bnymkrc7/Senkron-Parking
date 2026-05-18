@@ -82,8 +82,14 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label small text-uppercase text-secondary fw-bold">Şifre</label>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label small text-uppercase text-secondary fw-bold mb-0">Şifre</label>
+                                <a href="sifremi-unuttum.html" class="text-info text-decoration-none small fw-bold">Şifremi Unuttum?</a>
+                            </div>
                             <input type="password" class="form-control" id="password" placeholder="••••••••" required>
+                            <div id="passwordHelp" class="form-text text-secondary opacity-75 mt-2" style="font-size: 0.75rem;">
+                                * Şifreniz en az 8 karakter, 1 büyük harf ve 1 rakam içermelidir.
+                            </div>
                         </div>
 
                         <button type="submit" id="loginBtn" class="btn btn-primary w-100">Giriş Yap</button>
@@ -107,6 +113,15 @@
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
             const loginBtn = document.getElementById('loginBtn');
+
+            // --- YENİ EKLENEN KISIM: ŞİFRE KONTROLÜ ---
+            // Şifrenin en az 8 karakter, 1 büyük harf ve 1 rakam içerip içermediğini kontrol eder.
+            const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+            if (!passwordRegex.test(password)) {
+                alert("Lütfen şifrenizin en az 8 karakter, 1 büyük harf ve 1 rakam içerdiğinden emin olun.");
+                return; // Kurallara uymazsa işlemi durdurur.
+            }
+            // ------------------------------------------
 
             loginBtn.disabled = true;
             loginBtn.innerText = "Giriş Yapılıyor...";
@@ -137,12 +152,11 @@
                 .catch(err => {
                     alert("Hata: " + err.message);
                     loginBtn.disabled = false;
-                    // Yazım hatası düzeltildi: "Giriş Yap Yap" -> "Giriş Yap"
                     loginBtn.innerText = "Giriş Yap";
                 });
         });
     </script>
-<script src="../js/auth.js?v=2"></script>
+    <script src="../js/auth.js?v=2"></script>
 </body>
 
 </html>
