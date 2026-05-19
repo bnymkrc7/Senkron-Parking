@@ -82,8 +82,25 @@
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label small text-uppercase text-secondary fw-bold">Şifre</label>
-                            <input type="password" class="form-control" id="password" placeholder="••••••••" required>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label small text-uppercase text-secondary fw-bold mb-0">Şifre</label>
+                                <a href="sifremi-unuttum.html" class="text-info text-decoration-none small fw-bold">Şifremi Unuttum?</a>
+                            </div>
+                            <div class="position-relative">
+                                <input type="password" class="form-control" id="password" placeholder="••••••••" required style="padding-right: 70px;">
+                                <button type="button" id="togglePassword" class="btn position-absolute top-50 end-0 translate-middle-y text-info fw-bold" style="background: transparent; border: none; box-shadow: none; font-size: 0.85rem; padding-right: 15px;">Göster</button>
+                            </div>
+                            <div id="capsWarning" class="text-warning small mt-1 d-none" style="font-size: 0.75rem;">
+                                ⚠️ Uyarı: Caps Lock Açık!
+                            </div>
+                            <div id="passwordHelp" class="form-text text-secondary opacity-75 mt-2" style="font-size: 0.75rem;">
+                                * Şifreniz en az 8 karakter, 1 büyük harf ve 1 rakam içermelidir.
+                            </div>
+                        </div>
+
+                        <div class="mb-3 form-check d-flex align-items-center">
+                            <input type="checkbox" class="form-check-input" id="rememberMe" style="cursor: pointer; background-color: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2);">
+                            <label class="form-check-label small text-secondary fw-bold ms-2 mb-0" for="rememberMe" style="cursor: pointer; user-select: none;">Beni Hatırla</label>
                         </div>
 
                         <button type="submit" id="loginBtn" class="btn btn-primary w-100">Giriş Yap</button>
@@ -91,9 +108,7 @@
 
                     <div class="text-center mt-4 pt-3 border-top border-secondary border-opacity-25">
                         <span class="text-secondary small">Henüz hesabınız yok mu?</span><br>
-                        <a href="register.html"
-                            class="text-info text-decoration-none small fw-bold mt-1 d-inline-block">Yeni kayıt oluştur
-                            →</a>
+                        <a href="register.html" class="text-info text-decoration-none small fw-bold mt-1 d-inline-block">Yeni kayıt oluştur →</a>
                     </div>
                 </div>
             </div>
@@ -101,17 +116,45 @@
     </div>
 
     <script>
+        // --- SAYFA YÜKLENDİĞİNDE: BENİ HATIRLA KONTROLÜ ---
+        const savedEmail = localStorage.getItem('rememberedEmail');
+        if (savedEmail) {
+            document.getElementById('email').value = savedEmail;
+            document.getElementById('rememberMe').checked = true;
+        }
+
+        // --- ÖNERİ 3: CAPS LOCK TAKİBİ ---
+        const passwordInput = document.getElementById('password');
+        const capsWarning = document.getElementById('capsWarning');
+        
+        function checkCapsLock(e) {
+            if (e.getModifierState('CapsLock')) {
+                capsWarning.classList.remove('d-none');
+            } else {
+                capsWarning.classList.add('d-none');
+            }
+        }
+        passwordInput.addEventListener('keyup', checkCapsLock);
+        passwordInput.addEventListener('keydown', checkCapsLock);
+
+        // --- GİRİŞ YAPMA VE ŞİFRE KONTROL İŞLEMİ ---
         document.getElementById('loginForm').addEventListener('submit', function (e) {
             e.preventDefault();
 
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
+            const rememberMe = document.getElementById('rememberMe').checked;
             const loginBtn = document.getElementById('loginBtn');
+
+            const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+            if (!passwordRegex.test(password)) {
+                alert("Lütfen şifrenizin en az 8 karakter, 1 büyük harf ve 1 rakam içerdiğinden emin olun.");
+                return; 
+            }
 
             loginBtn.disabled = true;
             loginBtn.innerText = "Giriş Yapılıyor...";
 
-            // server.js üzerindeki login API'sine bağlanıyoruz
             fetch('/api/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -126,23 +169,33 @@
                 })
                 .then(data => {
                     alert("Giriş başarılı! Hoş geldin, " + data.user.username);
+                    
+                    if (rememberMe) {
+                        localStorage.setItem('rememberedEmail', email);
+                    } else {
+                        localStorage.removeItem('rememberedEmail');
+                    }
 
-                    // Kullanıcı bilgisini tarayıcıya kaydet (Anasayfada kullanmak için)
                     localStorage.setItem('user', JSON.stringify(data.user));
-
-                    // KRİTİK: Bir üst klasördeki (root) index.html'e yönlendirir
                     localStorage.setItem('username', data.user.username);
                     window.location.href = '../index.html';
                 })
                 .catch(err => {
                     alert("Hata: " + err.message);
                     loginBtn.disabled = false;
-                    // Yazım hatası düzeltildi: "Giriş Yap Yap" -> "Giriş Yap"
                     loginBtn.innerText = "Giriş Yap";
                 });
         });
+
+        // --- ŞİFRE GÖSTER/GİZLE İŞLEMİ ---
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const pwdInput = document.getElementById('password');
+            const type = pwdInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            pwdInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? 'Göster' : 'Gizle';
+        });
     </script>
-<script src="../js/auth.js?v=2"></script>
+    <script src="../js/auth.js?v=2"></script>
 </body>
 
 </html>
