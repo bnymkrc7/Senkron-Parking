@@ -133,6 +133,14 @@
                         </div>
                     </div>
 
+                    <!-- Abonelik Durumu -->
+                    <div class="info-card mb-4">
+                        <h5 class="fw-bold mb-4"><i class="fa-solid fa-file-contract text-primary me-2"></i>Abonelik Durumu</h5>
+                        <div id="subscriptionStatus">
+                            <div class="text-center text-muted py-3"><div class="spinner-border spinner-border-sm text-primary"></div> Yükleniyor...</div>
+                        </div>
+                    </div>
+
                     <!-- Reservation History -->
                     <div class="info-card">
                         <h5 class="fw-bold mb-4"><i class="fa-solid fa-clock-rotate-left text-primary me-2"></i>Son Rezervasyonlar</h5>
@@ -396,6 +404,47 @@
             }
         }
         loadReservations();
+
+        // --- ABONELİK DURUMUNU YÜKLE ---
+        async function loadSubscription() {
+            try {
+                const currentUser = username || user.username;
+                const res = await fetch('/api/subscription/' + currentUser);
+                const rows = await res.json();
+                const container = document.getElementById('subscriptionStatus');
+
+                if (!rows || rows.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-3">
+                            <i class="fa-solid fa-file-circle-xmark text-muted fs-3 mb-2 d-block"></i>
+                            <div class="text-muted mb-2">Henüz bir abonelik başvurunuz bulunmuyor.</div>
+                            <a href="abone.html" class="btn btn-sm btn-primary rounded-pill px-4"><i class="fa-solid fa-plus me-1"></i>Abone Ol</a>
+                        </div>`;
+                    return;
+                }
+
+                container.innerHTML = rows.map(s => {
+                    let badgeClass = '', badgeText = '', icon = '';
+                    if (s.status === 'beklemede') { badgeClass = 'bg-warning-subtle text-warning'; badgeText = 'Beklemede'; icon = 'fa-clock'; }
+                    else if (s.status === 'onaylandı') { badgeClass = 'bg-success-subtle text-success'; badgeText = 'Onaylandı'; icon = 'fa-circle-check'; }
+                    else { badgeClass = 'bg-danger-subtle text-danger'; badgeText = 'Reddedildi'; icon = 'fa-circle-xmark'; }
+
+                    return `
+                        <div class="d-flex justify-content-between align-items-center py-3 border-bottom" style="border-color: #f1f5f9 !important;">
+                            <div>
+                                <div class="fw-bold text-dark">${s.parking_location}</div>
+                                <div class="small text-muted">${s.subscription_type} · ${s.plate_number}</div>
+                            </div>
+                            <div>
+                                <span class="badge ${badgeClass} rounded-pill px-3 py-2 fw-bold"><i class="fa-solid ${icon} me-1"></i>${badgeText}</span>
+                            </div>
+                        </div>`;
+                }).join('');
+            } catch(e) {
+                document.getElementById('subscriptionStatus').innerHTML = '<div class="text-center text-muted py-3">Yüklenemedi.</div>';
+            }
+        }
+        loadSubscription();
     </script>
 </body>
 </html>

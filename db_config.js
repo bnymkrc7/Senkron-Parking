@@ -50,29 +50,47 @@ db.serialize(() => {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
     
+    // 4. Abonelikler Tablosu
+    db.run(`CREATE TABLE IF NOT EXISTS subscriptions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL,
+        first_name TEXT NOT NULL,
+        last_name TEXT NOT NULL,
+        tc_no TEXT NOT NULL,
+        phone TEXT NOT NULL,
+        email TEXT NOT NULL,
+        plate_number TEXT NOT NULL,
+        brand_model TEXT NOT NULL,
+        parking_location TEXT NOT NULL,
+        subscription_type TEXT NOT NULL,
+        status TEXT DEFAULT 'beklemede',
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+    
+    // 5. Öneri ve Şikayet Tablosu
+    db.run(`CREATE TABLE IF NOT EXISTS feedbacks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        full_name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        category TEXT NOT NULL,
+        message TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`);
+
     // Seed verileri ekleme (Zemin ve 1. Kat)
     db.get("SELECT COUNT(*) AS count FROM parking_slots", (err, row) => {
         if (!err && row.count === 0) {
             const stmt = db.prepare("INSERT INTO parking_slots (slot_number, status) VALUES (?, ?)");
             
-            const occupiedSpots = ['Z-02', 'Z-06', 'Z-11', 'Z-12', 'Z-16', '1K-06', '1K-07', '1K-09'];
-            const reservedSpots = ['Z-05', 'Z-14'];
-
             // Zemin Kat
             for(let i=1; i<=16; i++) {
                 let spot = `Z-${i.toString().padStart(2, '0')}`;
-                let status = 'empty';
-                if (occupiedSpots.includes(spot)) status = 'occupied';
-                if (reservedSpots.includes(spot)) status = 'reserved';
-                stmt.run(spot, status);
+                stmt.run(spot, 'empty');
             }
             // 1. Kat
             for(let i=1; i<=16; i++) {
                 let spot = `1K-${i.toString().padStart(2, '0')}`;
-                let status = 'empty';
-                if (occupiedSpots.includes(spot)) status = 'occupied';
-                if (reservedSpots.includes(spot)) status = 'reserved';
-                stmt.run(spot, status);
+                stmt.run(spot, 'empty');
             }
             stmt.finalize();
             console.log("Başlangıç otopark alanları (Zemin ve 1. Kat) veritabanına eklendi.");

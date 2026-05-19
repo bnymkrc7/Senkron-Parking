@@ -443,6 +443,83 @@ setInterval(() => {
     });
 }, 60000); // 60000 ms = 1 dakika
 
+// --- ABONELİK İŞLEMLERİ ---
+
+// 1. Yeni Abonelik Başvurusu
+app.post('/api/subscription/apply', (req, res) => {
+    const { username, first_name, last_name, tc_no, phone, email, plate_number, brand_model, parking_location, subscription_type } = req.body;
+
+    if (!username || !first_name || !last_name || !tc_no || !phone || !email || !plate_number || !brand_model || !parking_location || !subscription_type) {
+        return res.status(400).json({ error: "Lütfen tüm alanları doldurun." });
+    }
+
+    const query = `INSERT INTO subscriptions (username, first_name, last_name, tc_no, phone, email, plate_number, brand_model, parking_location, subscription_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+    
+    db.run(query, [username, first_name, last_name, tc_no, phone, email, plate_number, brand_model, parking_location, subscription_type], function(err) {
+        if (err) return res.status(500).json({ error: "Başvuru kaydedilirken bir hata oluştu." });
+        res.status(201).json({ message: "Başvurunuz başarıyla alınmıştır. En kısa sürede sizinle iletişime geçeceğiz." });
+    });
+});
+
+// 2. Admin: Tüm Abonelikleri Listele
+app.get('/api/admin/subscriptions', (req, res) => {
+    const query = `SELECT * FROM subscriptions ORDER BY created_at DESC`;
+    db.all(query, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: "Abonelikler alınamadı." });
+        res.status(200).json(rows);
+    });
+});
+
+// 3. Admin: Abonelik Durumu Güncelle (Onayla / Reddet)
+app.patch('/api/admin/subscriptions/:id', (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body; // 'onaylandı', 'reddedildi'
+
+    if (!status) return res.status(400).json({ error: "Durum bilgisi gerekli." });
+
+    const query = `UPDATE subscriptions SET status = ? WHERE id = ?`;
+    db.run(query, [status, id], function(err) {
+        if (err) return res.status(500).json({ error: "Durum güncellenemedi." });
+        res.status(200).json({ message: `Abonelik durumu '${status}' olarak güncellendi.` });
+    });
+});
+
+// 4. Kullanıcı: Kendi Abonelik Durumunu Sorgula
+app.get('/api/subscription/:username', (req, res) => {
+    const { username } = req.params;
+    const query = `SELECT * FROM subscriptions WHERE username = ? ORDER BY created_at DESC`;
+    db.all(query, [username], (err, rows) => {
+        if (err) return res.status(500).json({ error: "Abonelik bilgisi alınamadı." });
+        res.status(200).json(rows);
+    });
+});
+
+// --- ÖNERİ / ŞİKAYET İŞLEMLERİ ---
+
+// 1. Yeni Öneri/Şikayet Gönder
+app.post('/api/feedback', (req, res) => {
+    const { full_name, email, category, message } = req.body;
+
+    if (!full_name || !email || !category || !message) {
+        return res.status(400).json({ error: "Lütfen tüm alanları doldurun." });
+    }
+
+    const query = `INSERT INTO feedbacks (full_name, email, category, message) VALUES (?, ?, ?, ?)`;
+    db.run(query, [full_name, email, category, message], function(err) {
+        if (err) return res.status(500).json({ error: "Mesajınız kaydedilirken bir hata oluştu." });
+        res.status(201).json({ message: "Mesajınız başarıyla iletilmiştir. Teşekkür ederiz!" });
+    });
+});
+
+// 2. Admin: Tüm Öneri/Şikayetleri Listele
+app.get('/api/admin/feedbacks', (req, res) => {
+    const query = `SELECT * FROM feedbacks ORDER BY created_at DESC`;
+    db.all(query, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: "Geri bildirimler alınamadı." });
+        res.status(200).json(rows);
+    });
+});
+
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Sunucu ${PORT} portunda çalışıyor...`);
