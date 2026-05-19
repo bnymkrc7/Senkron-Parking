@@ -411,7 +411,6 @@ setInterval(() => {
     });
 }, 60000); // 60000 ms = 1 dakika
 
-// --- SUNUCU BAŞLATMA ---
 const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Sunucu ${PORT} portunda çalışıyor...`);
