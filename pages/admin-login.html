@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senkron | Admin Girişi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0c0a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            color: #f8fafc;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle at 30% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 50%, rgba(239, 68, 68, 0.06) 0%, transparent 50%);
+            animation: pulse 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.05); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            position: relative;
+            z-index: 1;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 12px;
+            padding: 14px 16px;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-color: #ef4444;
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+        }
+
+        .btn-admin {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            font-weight: 700;
+            padding: 14px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .btn-admin:hover {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.3);
+        }
+
+        .brand-logo {
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: #ef4444;
+        }
+
+        .admin-badge {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+            padding: 4px 14px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .admin-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .back-link {
+            color: rgba(255,255,255,0.4);
+            text-decoration: none;
+            font-size: 0.85rem;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover {
+            color: rgba(255,255,255,0.8);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+                <div class="card glass-card p-4">
+                    <div class="text-center mb-4">
+                        <div class="admin-icon">
+                            <i class="fa-solid fa-shield-halved text-danger fs-2"></i>
+                        </div>
+                        <h2 class="brand-logo mb-2">SENKRON</h2>
+                        <span class="admin-badge">Yönetici Paneli</span>
+                    </div>
+
+                    <form id="adminLoginForm">
+                        <div class="mb-3">
+                            <label class="form-label small text-uppercase text-secondary fw-bold">Kullanıcı Adı</label>
+                            <input type="text" class="form-control" id="adminUsername" placeholder="admin" required autocomplete="off">
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label small text-uppercase text-secondary fw-bold">Şifre</label>
+                            <div class="position-relative">
+                                <input type="password" class="form-control" id="adminPassword" placeholder="••••••••" required style="padding-right: 70px;">
+                                <button type="button" id="togglePassword" class="btn position-absolute top-50 end-0 translate-middle-y text-danger fw-bold" style="background: transparent; border: none; box-shadow: none; font-size: 0.85rem; padding-right: 15px;">Göster</button>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="adminLoginBtn" class="btn btn-admin w-100">
+                            <i class="fa-solid fa-right-to-bracket me-2"></i>Yönetici Girişi
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4 pt-3 border-top border-secondary border-opacity-25">
+                        <a href="../index.html" class="back-link">
+                            <i class="fa-solid fa-arrow-left me-1"></i> Ana Sayfaya Dön
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- ADMIN GİRİŞ İŞLEMİ ---
+        document.getElementById('adminLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const username = document.getElementById('adminUsername').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+            const loginBtn = document.getElementById('adminLoginBtn');
+
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Giriş Yapılıyor...';
+
+            fetch('/api/admin/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => {
+                if (response.ok) return response.json();
+                return response.json().then(data => { throw new Error(data.error); });
+            })
+            .then(data => {
+                localStorage.setItem('adminUser', JSON.stringify(data.admin));
+                window.location.href = 'admin-panel.html';
+            })
+            .catch(err => {
+                alert("Hata: " + err.message);
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-2"></i>Yönetici Girişi';
+            });
+        });
+
+        // --- ŞİFRE GÖSTER/GİZLE ---
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const pwdInput = document.getElementById('adminPassword');
+            const type = pwdInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            pwdInput.setAttribute('type', type);
+            this.textContent = type === 'password' ? 'Göster' : 'Gizle';
+        });
+
+        // Zaten giriş yapmışsa panele yönlendir
+        if (localStorage.getItem('adminUser')) {
+            window.location.href = 'admin-panel.html';
+        }
+    </script>
+</body>
+</html>

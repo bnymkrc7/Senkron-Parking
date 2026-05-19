@@ -41,7 +41,7 @@ app.post('/api/login', async (req, res) => {
 
         res.status(200).json({
             message: "Giriş başarılı!",
-            user: { id: user.id, username: user.username, plate: user.plate_number }
+            user: { id: user.id, username: user.username, email: user.email, plate: user.plate_number }
         });
     });
 });
@@ -82,6 +82,32 @@ app.patch('/api/user/update-plate', (req, res) => {
         if (err) return res.status(500).json({ error: "Plaka güncellenirken bir hata oluştu." });
         res.status(200).json({ message: "Plaka başarıyla güncellendi!" });
     });
+});
+
+// --- ŞİFRE GÜNCELLEME ---
+app.put('/api/user/update-password', async (req, res) => {
+    const { userId, newPassword } = req.body;
+
+    if (!userId || !newPassword) {
+        return res.status(400).json({ error: "Kullanıcı ID ve yeni şifre gerekli." });
+    }
+
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+        return res.status(400).json({ error: "Şifreniz en az 8 karakter, 1 büyük harf ve 1 rakam içermelidir." });
+    }
+
+    try {
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const query = `UPDATE users SET password = ? WHERE id = ?`;
+        
+        db.run(query, [hashedPassword, userId], function(err) {
+            if (err) return res.status(500).json({ error: "Şifre güncellenirken bir hata oluştu." });
+            res.status(200).json({ message: "Şifre başarıyla güncellendi!" });
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Sunucu hatası." });
+    }
 });
 
 // --- REZERVASYON İŞLEMLERİ ---
@@ -137,27 +163,71 @@ app.delete('/api/reservations/:id', (req, res) => {
     });
 });
 
-// --- SPRINT 4: ÜCRET HESAPLAMA VE ARAÇ ÇIKIŞ API (Senkronize Edildi) ---
-app.post('/api/reserve/exit', (req, res) => {
-    const { slot_number } = req.body; // Ekibin yeni yapısına göre slot_number (Örn: 'Z-03') alıyoruz
-    const hourlyRate = 30; 
+// --- ARAÇ GİRİŞ API (Plaka Okuma ile Otomatik) ---
+app.post('/api/vehicle/enter', (req, res) => {
+    const { plate_number } = req.body;
 
-    if (!slot_number) {
-        return res.status(400).json({ error: "Slot numarası gerekli." });
+    if (!plate_number) {
+        return res.status(400).json({ error: "Plaka numarası gerekli." });
     }
 
-    const hoursParked = 2; 
-    const totalFee = hoursParked * hourlyRate;
+    // Rezervasyonlar tablosunda bu plakaya ait aktif bir kayıt var mı kontrol et
+    const findQuery = `SELECT r.id, r.slot_number FROM reservations r JOIN parking_slots p ON r.slot_number = p.slot_number WHERE r.plate_number = ? AND p.status = 'reserved'`;
 
-    // Durumu ekibin yapısına uygun olarak 'empty' yapıyoruz
-    const query = `UPDATE parking_slots SET status = 'empty' WHERE slot_number = ?`;
+    db.get(findQuery, [plate_number], (err, row) => {
+        if (err) return res.status(500).json({ error: "Sunucu hatası." });
+        if (!row) return res.status(404).json({ error: "Bu plakaya ait aktif bir rezervasyon bulunamadı." });
 
-    db.run(query, [slot_number], function(err) {
-        if (err) return res.status(500).json({ error: "Çıkış işlemi başarısız." });
-        res.status(200).json({ 
-            message: "Araç çıkışı yapıldı.",
-            hours: hoursParked,
-            fee: totalFee 
+        // Alanın durumunu 'occupied' (dolu / kırmızı) yap
+        db.run(`UPDATE parking_slots SET status = 'occupied' WHERE slot_number = ?`, [row.slot_number], function(err) {
+            if (err) return res.status(500).json({ error: "Park alanı durumu güncellenemedi." });
+
+            console.log(`[ARAÇ GİRİŞ] Plaka: ${plate_number}, Slot: ${row.slot_number} → occupied`);
+            res.status(200).json({
+                message: `${plate_number} plakalı araç ${row.slot_number} alanına giriş yaptı.`,
+                slot_number: row.slot_number
+            });
+        });
+    });
+});
+
+// --- ARAÇ ÇIKIŞ API (Plaka Okuma ile Otomatik) ---
+app.post('/api/vehicle/exit', (req, res) => {
+    const { plate_number } = req.body;
+    const hourlyRate = 30;
+
+    if (!plate_number) {
+        return res.status(400).json({ error: "Plaka numarası gerekli." });
+    }
+
+    // Rezervasyonlar tablosunda bu plakaya ait kaydı bul
+    const findQuery = `SELECT r.id, r.slot_number, r.created_at FROM reservations r JOIN parking_slots p ON r.slot_number = p.slot_number WHERE r.plate_number = ? AND p.status = 'occupied'`;
+
+    db.get(findQuery, [plate_number], (err, row) => {
+        if (err) return res.status(500).json({ error: "Sunucu hatası." });
+        if (!row) return res.status(404).json({ error: "Bu plakaya ait park halinde bir araç bulunamadı." });
+
+        // Geçen süreyi hesapla (saat cinsinden, minimum 1 saat)
+        const entryTime = new Date(row.created_at);
+        const now = new Date();
+        const diffMs = now - entryTime;
+        const hoursParked = Math.max(1, Math.ceil(diffMs / (1000 * 60 * 60)));
+        const totalFee = hoursParked * hourlyRate;
+
+        // 1. Alanı 'empty' (boş / yeşil) yap
+        db.run(`UPDATE parking_slots SET status = 'empty' WHERE slot_number = ?`, [row.slot_number], function(err) {
+            if (err) return res.status(500).json({ error: "Park alanı durumu güncellenemedi." });
+
+            // 2. Rezervasyon kaydını sil
+            db.run(`DELETE FROM reservations WHERE id = ?`, [row.id], function(err) {
+                console.log(`[ARAÇ ÇIKIŞ] Plaka: ${plate_number}, Slot: ${row.slot_number} → empty (${hoursParked} saat, ${totalFee} TL)`);
+                res.status(200).json({
+                    message: `${plate_number} plakalı araç ${row.slot_number} alanından çıkış yaptı.`,
+                    slot_number: row.slot_number,
+                    hours: hoursParked,
+                    fee: totalFee
+                });
+            });
         });
     });
 });
@@ -194,6 +264,86 @@ app.put('/api/admin/manage-slot', (req, res) => {
         res.status(200).json({ message: `Slot ${slot_number} durumu '${status}' olarak güncellendi.` });
     });
 });
+
+// --- ADMIN GİRİŞ API ---
+app.post('/api/admin/login', (req, res) => {
+    const { username, password } = req.body;
+
+    // Sabit admin kimlik bilgileri
+    const ADMIN_USER = 'admin';
+    const ADMIN_PASS = 'Senkron2026';
+
+    if (!username || !password) {
+        return res.status(400).json({ error: "Kullanıcı adı ve şifre gerekli." });
+    }
+
+    if (username === ADMIN_USER && password === ADMIN_PASS) {
+        res.status(200).json({ message: "Admin girişi başarılı!", admin: { username: ADMIN_USER } });
+    } else {
+        res.status(401).json({ error: "Geçersiz admin bilgileri." });
+    }
+});
+
+// --- ADMIN: TÜM REZERVASYONLARI LİSTELE ---
+app.get('/api/admin/reservations', (req, res) => {
+    const query = `SELECT r.*, p.status as slot_status FROM reservations r LEFT JOIN parking_slots p ON r.slot_number = p.slot_number ORDER BY r.created_at DESC`;
+    
+    db.all(query, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: "Rezervasyonlar alınamadı." });
+        res.status(200).json(rows);
+    });
+});
+
+// --- ADMIN: TÜM KULLANICILARI LİSTELE ---
+app.get('/api/admin/users', (req, res) => {
+    const query = `SELECT id, username, email, plate_number FROM users ORDER BY id DESC`;
+    
+    db.all(query, [], (err, rows) => {
+        if (err) return res.status(500).json({ error: "Kullanıcılar alınamadı." });
+        res.status(200).json(rows);
+    });
+});
+
+// --- OTOMATİK REZERVASYON İPTALİ (CRON JOB) ---
+// Her 1 dakikada bir çalışarak süresi dolmuş rezervasyonları kontrol eder.
+setInterval(() => {
+    // Mevcut zaman (UTC) ile rezervasyon zamanını (arrival_time + 60 dk ek süre) karşılaştırır
+    const query = `
+        SELECT r.id, r.slot_number 
+        FROM reservations r 
+        JOIN parking_slots p ON r.slot_number = p.slot_number 
+        WHERE p.status = 'reserved' 
+        AND datetime(r.created_at, '+' || r.arrival_time || ' minutes', '+60 minutes') < datetime('now')
+    `;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Otomatik iptal kontrolünde hata oluştu:", err.message);
+            return;
+        }
+
+        if (rows && rows.length > 0) {
+            rows.forEach(row => {
+                // 1. Rezervasyonu iptal et / sil
+                db.run(`DELETE FROM reservations WHERE id = ?`, [row.id], function(err) {
+                    if (err) {
+                        console.error(`Rezervasyon ${row.id} silinirken hata:`, err.message);
+                        return;
+                    }
+
+                    // 2. Otopark alanını tekrar 'empty' yap
+                    db.run(`UPDATE parking_slots SET status = 'empty' WHERE slot_number = ?`, [row.slot_number], function(err) {
+                        if (err) {
+                            console.error(`Slot ${row.slot_number} güncellenirken hata:`, err.message);
+                        } else {
+                            console.log(`[OTOMATİK İPTAL] Rezervasyon ID: ${row.id}, Slot: ${row.slot_number} (Giriş yapılmadığı için iptal edildi)`);
+                        }
+                    });
+                });
+            });
+        }
+    });
+}, 60000); // 60000 ms = 1 dakika
 
 // --- SUNUCU BAŞLATMA ---
 const PORT = 3000;

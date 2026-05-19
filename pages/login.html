@@ -93,9 +93,7 @@
                             <div id="capsWarning" class="text-warning small mt-1 d-none" style="font-size: 0.75rem;">
                                 ⚠️ Uyarı: Caps Lock Açık!
                             </div>
-                            <div id="passwordHelp" class="form-text text-secondary opacity-75 mt-2" style="font-size: 0.75rem;">
-                                * Şifreniz en az 8 karakter, 1 büyük harf ve 1 rakam içermelidir.
-                            </div>
+
                         </div>
 
                         <div class="mb-3 form-check d-flex align-items-center">
@@ -146,11 +144,7 @@
             const rememberMe = document.getElementById('rememberMe').checked;
             const loginBtn = document.getElementById('loginBtn');
 
-            const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
-            if (!passwordRegex.test(password)) {
-                alert("Lütfen şifrenizin en az 8 karakter, 1 büyük harf ve 1 rakam içerdiğinden emin olun.");
-                return; 
-            }
+
 
             loginBtn.disabled = true;
             loginBtn.innerText = "Giriş Yapılıyor...";
@@ -178,7 +172,15 @@
 
                     localStorage.setItem('user', JSON.stringify(data.user));
                     localStorage.setItem('username', data.user.username);
-                    window.location.href = '../index.html';
+                    
+                    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+                    if (!passwordRegex.test(password)) {
+                        localStorage.setItem('mustChangePassword', 'true');
+                        window.location.href = 'sifre-guncelle.html';
+                    } else {
+                        localStorage.removeItem('mustChangePassword');
+                        window.location.href = '../index.html';
+                    }
                 })
                 .catch(err => {
                     alert("Hata: " + err.message);

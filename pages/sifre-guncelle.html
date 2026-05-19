@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Senkron | Şifre Güncelleme Zorunlu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            color: #f8fafc;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 12px;
+            padding: 12px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border-color: #38bdf8;
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.15);
+        }
+
+        .btn-primary {
+            background-color: #38bdf8;
+            color: #0f172a;
+            border: none;
+            font-weight: 700;
+            padding: 14px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary:hover {
+            background-color: #0ea5e9;
+            transform: translateY(-2px);
+        }
+
+        .brand-logo {
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: #38bdf8;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card glass-card p-4">
+                    <div class="text-center mb-4">
+                        <h2 class="brand-logo mb-1">SENKRON</h2>
+                        <p class="text-warning small text-uppercase fw-bold">Güvenlik Güncellemesi Gerekli</p>
+                    </div>
+
+                    <div class="alert alert-warning" style="background: rgba(255,193,7,0.1); border-color: rgba(255,193,7,0.3); color: #ffc107;">
+                        Sistem güvenliğimiz güncellenmiştir. Hesabınızı kullanmaya devam edebilmek için lütfen şifrenizi yeni kurallara uygun olarak güncelleyin.
+                    </div>
+
+                    <form id="updatePasswordForm">
+                        <div class="mb-3">
+                            <label class="form-label small text-uppercase text-secondary fw-bold">Yeni Şifre</label>
+                            <input type="password" class="form-control" id="newPassword" placeholder="••••••••" required>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label small text-uppercase text-secondary fw-bold">Yeni Şifre (Tekrar)</label>
+                            <input type="password" class="form-control" id="newPasswordConfirm" placeholder="••••••••" required>
+                            
+                            <div id="passwordHelp" class="form-text text-secondary opacity-75 mt-2" style="font-size: 0.75rem;">
+                                * Şifreniz en az 8 karakter, 1 büyük harf ve 1 rakam içermelidir.
+                            </div>
+                        </div>
+
+                        <button type="submit" id="updateBtn" class="btn btn-primary w-100">Şifremi Güncelle</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const userStr = localStorage.getItem('user');
+            if (!userStr || localStorage.getItem('mustChangePassword') !== 'true') {
+                // Bu sayfaya yetkisiz erişim varsa ana sayfaya at
+                window.location.href = '../index.html';
+                return;
+            }
+
+            const user = JSON.parse(userStr);
+
+            document.getElementById('updatePasswordForm').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const newPassword = document.getElementById('newPassword').value.trim();
+                const newPasswordConfirm = document.getElementById('newPasswordConfirm').value.trim();
+                const updateBtn = document.getElementById('updateBtn');
+
+                if (newPassword !== newPasswordConfirm) {
+                    alert("Şifreler uyuşmuyor!");
+                    return;
+                }
+
+                const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+                if (!passwordRegex.test(newPassword)) {
+                    alert("Lütfen şifrenizin en az 8 karakter, 1 büyük harf ve 1 rakam içerdiğinden emin olun.");
+                    return; 
+                }
+
+                updateBtn.disabled = true;
+                updateBtn.innerText = "Güncelleniyor...";
+
+                fetch('/api/user/update-password', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: user.id, newPassword })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        return response.json().then(data => { throw new Error(data.error); });
+                    }
+                })
+                .then(data => {
+                    alert("Şifreniz başarıyla güncellendi! Artık sistemi kullanabilirsiniz.");
+                    localStorage.removeItem('mustChangePassword');
+                    window.location.href = '../index.html';
+                })
+                .catch(err => {
+                    alert("Hata: " + err.message);
+                    updateBtn.disabled = false;
+                    updateBtn.innerText = "Şifremi Güncelle";
+                });
+            });
+        });
+    </script>
+</body>
+</html>
