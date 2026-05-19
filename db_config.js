@@ -17,6 +17,20 @@ db.serialize(() => {
         email TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
         plate_number TEXT
+    )`, (err) => {
+        if (!err) {
+            db.run(`ALTER TABLE users ADD COLUMN phone TEXT`, (err) => {
+                // Ignore error if column already exists
+            });
+        }
+    });
+
+    // Araçlar Tablosu (Çoklu araç yönetimi için)
+    db.run(`CREATE TABLE IF NOT EXISTS user_vehicles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL,
+        plate_number TEXT NOT NULL,
+        brand_model TEXT
     )`);
 
     // 2. Otopark Alanları Tablosu

@@ -99,12 +99,12 @@
                                 <div class="info-value" id="infoEmail">-</div>
                             </div>
                             <div class="col-md-6">
-                                <div class="info-label">Araç Plakası</div>
-                                <div id="plateDisplay">
-                                    <span class="info-value" id="infoPlate">-</span>
+                                <div class="info-label">Telefon Numarası</div>
+                                <div id="phoneDisplay">
+                                    <span class="info-value" id="infoPhone">-</span>
                                 </div>
-                                <div id="plateEdit" class="d-none">
-                                    <input type="text" class="edit-input" id="editPlateInput" placeholder="34 ABC 123">
+                                <div id="phoneEdit" class="d-none">
+                                    <input type="text" class="edit-input" id="editPhoneInput" placeholder="05XX XXX XX XX">
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -115,8 +115,21 @@
 
                         <!-- Save/Cancel buttons (hidden by default) -->
                         <div id="editActions" class="d-none mt-4 d-flex gap-2">
-                            <button class="btn btn-primary rounded-pill px-4" onclick="savePlate()"><i class="fa-solid fa-check me-1"></i>Kaydet</button>
+                            <button class="btn btn-primary rounded-pill px-4" onclick="savePhone()"><i class="fa-solid fa-check me-1"></i>Kaydet</button>
                             <button class="btn btn-outline-secondary rounded-pill px-4" onclick="toggleEdit()">İptal</button>
+                        </div>
+                    </div>
+
+                    <!-- Araçlarım -->
+                    <div class="info-card mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h5 class="fw-bold mb-0"><i class="fa-solid fa-car text-primary me-2"></i>Araçlarım</h5>
+                            <button class="btn btn-sm btn-primary rounded-pill px-3" onclick="openAddVehicleModal()">
+                                <i class="fa-solid fa-plus me-1"></i>Yeni Araç Ekle
+                            </button>
+                        </div>
+                        <div id="vehiclesList">
+                            <div class="text-center text-muted py-3">Yükleniyor...</div>
                         </div>
                     </div>
 
@@ -178,6 +191,33 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../js/auth.js?v=3"></script>
+
+    <!-- Araç Modal -->
+    <div class="modal fade" id="vehicleModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow" style="border-radius: 16px;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="vehicleModalLabel">Yeni Araç Ekle</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="vehicleIdInput">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Araç Plakası</label>
+                        <input type="text" class="form-control edit-input" id="vehiclePlateInput" placeholder="34 ABC 123">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Marka / Model (İsteğe Bağlı)</label>
+                        <input type="text" class="form-control edit-input" id="vehicleBrandInput" placeholder="Örn: Toyota Corolla">
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">İptal</button>
+                    <button type="button" class="btn btn-primary rounded-pill px-4" onclick="saveVehicle()">Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
         // --- OTURUM KONTROLÜ ---
         const userStr = localStorage.getItem('user');
@@ -191,40 +231,136 @@
         document.getElementById('profileEmail').textContent = user.email || '-';
         document.getElementById('infoUsername').textContent = user.username || username || '-';
         document.getElementById('infoEmail').textContent = user.email || '-';
-        document.getElementById('infoPlate').textContent = user.plate || '-';
-        if (user.plate) document.getElementById('editPlateInput').value = user.plate;
+        
+        // Sunucudan daha detaylı profil verisi çekme (Telefon ve Araçlar için)
+        async function loadProfileData() {
+            try {
+                const res = await fetch('/api/user/' + (username || user.username) + '/profile');
+                if (res.ok) {
+                    const data = await res.json();
+                    
+                    // Telefon numarası
+                    const phone = data.user.phone || '-';
+                    document.getElementById('infoPhone').textContent = phone;
+                    if (data.user.phone) {
+                        document.getElementById('editPhoneInput').value = data.user.phone;
+                    }
+                    
+                    // ID'yi globale kaydet
+                    window.currentUserId = data.user.id;
 
-        // --- PLAKA DÜZENLEME ---
+                    // Araçları Listele
+                    renderVehicles(data.vehicles);
+                }
+            } catch (e) { console.error('Profil verisi alınamadı:', e); }
+        }
+        loadProfileData();
+
+        // --- TELEFON DÜZENLEME ---
         let isEditing = false;
         function toggleEdit() {
             isEditing = !isEditing;
-            document.getElementById('plateDisplay').classList.toggle('d-none', isEditing);
-            document.getElementById('plateEdit').classList.toggle('d-none', !isEditing);
+            document.getElementById('phoneDisplay').classList.toggle('d-none', isEditing);
+            document.getElementById('phoneEdit').classList.toggle('d-none', !isEditing);
             document.getElementById('editActions').classList.toggle('d-none', !isEditing);
             document.getElementById('editToggleBtn').classList.toggle('d-none', isEditing);
         }
 
-        async function savePlate() {
-            const newPlate = document.getElementById('editPlateInput').value.trim();
-            if (!newPlate) { alert('Plaka boş olamaz.'); return; }
+        async function savePhone() {
+            const newPhone = document.getElementById('editPhoneInput').value.trim();
+            if (!window.currentUserId) return;
 
             try {
-                const res = await fetch('/api/user/update-plate', {
+                const res = await fetch('/api/user/phone', {
                     method: 'PATCH',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: user.id, newPlate })
+                    body: JSON.stringify({ userId: window.currentUserId, phone: newPhone })
                 });
-                const data = await res.json();
                 if (res.ok) {
-                    user.plate = newPlate;
-                    localStorage.setItem('user', JSON.stringify(user));
-                    document.getElementById('infoPlate').textContent = newPlate;
+                    document.getElementById('infoPhone').textContent = newPhone;
                     toggleEdit();
-                    alert('Plaka başarıyla güncellendi!');
+                    alert('Telefon numarası güncellendi!');
                 } else {
-                    alert('Hata: ' + data.error);
+                    alert('Hata oluştu.');
                 }
             } catch(e) { alert('Sunucu hatası.'); }
+        }
+
+        // --- ARAÇ YÖNETİMİ ---
+        const vehicleModal = new bootstrap.Modal(document.getElementById('vehicleModal'));
+
+        function renderVehicles(vehicles) {
+            const container = document.getElementById('vehiclesList');
+            if (!vehicles || vehicles.length === 0) {
+                container.innerHTML = '<div class="text-center text-muted py-3"><i class="fa-solid fa-car-side me-2"></i>Kayıtlı aracınız bulunmuyor.</div>';
+                return;
+            }
+
+            container.innerHTML = vehicles.map(v => `
+                <div class="d-flex justify-content-between align-items-center py-3 border-bottom" style="border-color: #f1f5f9 !important;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-primary-subtle text-primary rounded px-3 py-2 fw-bold" style="letter-spacing: 1px;">
+                            ${v.plate_number}
+                        </div>
+                        <div class="text-muted small">${v.brand_model || 'Belirtilmemiş'}</div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-sm btn-outline-primary rounded-circle" onclick="openEditVehicleModal('${v.id}', '${v.plate_number}', '${v.brand_model || ''}')" style="width: 32px; height: 32px; padding: 0;"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn btn-sm btn-outline-danger rounded-circle" onclick="deleteVehicle('${v.id}')" style="width: 32px; height: 32px; padding: 0;"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openAddVehicleModal() {
+            document.getElementById('vehicleIdInput').value = '';
+            document.getElementById('vehiclePlateInput').value = '';
+            document.getElementById('vehicleBrandInput').value = '';
+            document.getElementById('vehicleModalLabel').textContent = 'Yeni Araç Ekle';
+            vehicleModal.show();
+        }
+
+        function openEditVehicleModal(id, plate, brand) {
+            document.getElementById('vehicleIdInput').value = id;
+            document.getElementById('vehiclePlateInput').value = plate;
+            document.getElementById('vehicleBrandInput').value = brand === 'null' ? '' : brand;
+            document.getElementById('vehicleModalLabel').textContent = 'Aracı Düzenle';
+            vehicleModal.show();
+        }
+
+        async function saveVehicle() {
+            const id = document.getElementById('vehicleIdInput').value;
+            const plate_number = document.getElementById('vehiclePlateInput').value.trim();
+            const brand_model = document.getElementById('vehicleBrandInput').value.trim();
+
+            if (!plate_number) { alert('Lütfen plaka giriniz.'); return; }
+
+            const method = id ? 'PUT' : 'POST';
+            const endpoint = id ? '/api/user/vehicle/' + id : '/api/user/vehicle';
+
+            try {
+                const res = await fetch(endpoint, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: username || user.username, plate_number, brand_model })
+                });
+
+                if (res.ok) {
+                    vehicleModal.hide();
+                    loadProfileData(); // Listeyi yenile
+                } else {
+                    const data = await res.json();
+                    alert(data.error || 'Hata oluştu.');
+                }
+            } catch (e) { alert('Sunucu hatası.'); }
+        }
+
+        async function deleteVehicle(id) {
+            if (!confirm('Bu aracı silmek istediğinize emin misiniz?')) return;
+            try {
+                const res = await fetch('/api/user/vehicle/' + id, { method: 'DELETE' });
+                if (res.ok) { loadProfileData(); }
+            } catch (e) { alert('Sunucu hatası.'); }
         }
 
         // --- REZERVASYONLARI YÜKLE ---

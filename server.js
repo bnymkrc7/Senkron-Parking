@@ -110,6 +110,72 @@ app.put('/api/user/update-password', async (req, res) => {
     }
 });
 
+// --- KULLANICI PROFİLİ VE ARAÇ YÖNETİMİ ---
+
+// Kullanıcı Profilini ve Araçlarını Getir
+app.get('/api/user/:username/profile', (req, res) => {
+    const { username } = req.params;
+    const query = `SELECT id, username, email, phone, plate_number FROM users WHERE username = ?`;
+
+    db.get(query, [username], (err, user) => {
+        if (err) return res.status(500).json({ error: "Sunucu hatası." });
+        if (!user) return res.status(404).json({ error: "Kullanıcı bulunamadı." });
+
+        const vehiclesQuery = `SELECT * FROM user_vehicles WHERE username = ?`;
+        db.all(vehiclesQuery, [username], (err, vehicles) => {
+            if (err) return res.status(500).json({ error: "Araçlar alınamadı." });
+            res.status(200).json({ user, vehicles });
+        });
+    });
+});
+
+// Telefon Numarası Güncelle
+app.patch('/api/user/phone', (req, res) => {
+    const { userId, phone } = req.body;
+    if (!userId) return res.status(400).json({ error: "Kullanıcı ID gerekli." });
+
+    const query = `UPDATE users SET phone = ? WHERE id = ?`;
+    db.run(query, [phone, userId], function(err) {
+        if (err) return res.status(500).json({ error: "Telefon güncellenirken hata oluştu." });
+        res.status(200).json({ message: "Telefon numarası güncellendi!" });
+    });
+});
+
+// Yeni Araç Ekle
+app.post('/api/user/vehicle', (req, res) => {
+    const { username, plate_number, brand_model } = req.body;
+    if (!username || !plate_number) return res.status(400).json({ error: "Kullanıcı adı ve plaka gerekli." });
+
+    const query = `INSERT INTO user_vehicles (username, plate_number, brand_model) VALUES (?, ?, ?)`;
+    db.run(query, [username, plate_number, brand_model], function(err) {
+        if (err) return res.status(500).json({ error: "Araç eklenirken hata oluştu." });
+        res.status(201).json({ message: "Araç başarıyla eklendi!", vehicleId: this.lastID });
+    });
+});
+
+// Araç Güncelle
+app.put('/api/user/vehicle/:id', (req, res) => {
+    const { plate_number, brand_model } = req.body;
+    const { id } = req.params;
+    if (!plate_number) return res.status(400).json({ error: "Plaka numarası gerekli." });
+
+    const query = `UPDATE user_vehicles SET plate_number = ?, brand_model = ? WHERE id = ?`;
+    db.run(query, [plate_number, brand_model, id], function(err) {
+        if (err) return res.status(500).json({ error: "Araç güncellenirken hata oluştu." });
+        res.status(200).json({ message: "Araç başarıyla güncellendi!" });
+    });
+});
+
+// Araç Sil
+app.delete('/api/user/vehicle/:id', (req, res) => {
+    const { id } = req.params;
+    const query = `DELETE FROM user_vehicles WHERE id = ?`;
+    db.run(query, [id], function(err) {
+        if (err) return res.status(500).json({ error: "Araç silinirken hata oluştu." });
+        res.status(200).json({ message: "Araç başarıyla silindi." });
+    });
+});
+
 // --- REZERVASYON İŞLEMLERİ ---
 
 // 1. Kullanıcının rezervasyonlarını getir

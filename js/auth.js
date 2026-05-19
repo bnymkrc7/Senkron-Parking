@@ -24,9 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     <i class="fa-solid fa-circle-user me-2 fs-5"></i>
                     <span class="fw-bold">${currentUser}</span>
                 </a>
-                <a href="${reservationsLink}" class="btn btn-sm btn-primary ms-3 rounded-pill px-3 shadow-sm">
-                    <i class="fa-solid fa-list-check me-1"></i> Rezervasyonlarım
-                </a>
                 <button class="btn btn-sm btn-link text-danger ms-2 text-decoration-none" onclick="logout()" title="Çıkış Yap">
                     <i class="fa-solid fa-right-from-bracket"></i>
                 </button>
