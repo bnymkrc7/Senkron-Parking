@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Şifremi Unuttum | Senkron Parking</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background-color: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; width: 300px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button:hover { background-color: #0056b3; }
+        #message { margin-top: 15px; font-weight: bold; font-size: 14px; }
+        .link { display: block; margin-top: 15px; color: #007bff; text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Şifre Sıfırlama</h2>
+        <p style="font-size: 13px; color: gray;">Güvenliğiniz için sisteme kayıtlı plakanızı girmeniz gerekmektedir.</p>
+        
+        <form id="forgotPasswordForm">
+            <input type="email" id="email" placeholder="E-posta Adresiniz" required>
+            <input type="text" id="plate_number" placeholder="Araç Plakanız (Örn: 34 SVD 18)" required>
+            <input type="password" id="newPassword" placeholder="Yeni Şifre (En az 1 Büyük, 1 Rakam)" required>
+            
+            <button type="submit">Şifremi Güncelle</button>
+        </form>
+
+        <div id="message"></div>
+        <a href="/pages/login.html" class="link">Giriş Ekranına Dön</a>
+    </div>
+
+    <script>
+        document.getElementById('forgotPasswordForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); 
+            
+            const email = document.getElementById('email').value;
+            const plate_number = document.getElementById('plate_number').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const messageEl = document.getElementById('message');
+
+            try {
+           
+                const response = await fetch('/api/user/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, plate_number, newPassword })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    messageEl.style.color = "green";
+                    messageEl.innerText = data.message;
+            
+                    setTimeout(() => { window.location.href = '/pages/login.html'; }, 2000);
+                } else {
+                    messageEl.style.color = "red";
+                    messageEl.innerText = data.error; 
+                }
+            } catch (err) {
+                messageEl.style.color = "red";
+                messageEl.innerText = "Sunucuya bağlanılamadı. Lütfen tekrar deneyin.";
+            }
+        });
+    </script>
+</body>
+</html>

@@ -83,7 +83,41 @@ app.patch('/api/user/update-plate', (req, res) => {
         res.status(200).json({ message: "Plaka başarıyla güncellendi!" });
     });
 });
+// --- ŞİFREMİ UNUTTUM API (Giriş Yapmamış Kullanıcılar İçin) ---
+app.post('/api/user/forgot-password', async (req, res) => {
+    const { email, plate_number, newPassword } = req.body;
 
+    if (!email || !plate_number || !newPassword) {
+        return res.status(400).json({ error: "E-posta, plaka ve yeni şifre gereklidir." });
+    }
+
+    // Şifre güvenliği kontrolü
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+        return res.status(400).json({ error: "Şifreniz en az 8 karakter, 1 büyük harf ve 1 rakam içermelidir." });
+    }
+
+    // Kullanıcıyı e-posta ve plaka eşleşmesiyle doğrula (Güvenlik adımı)
+    const checkQuery = `SELECT id FROM users WHERE email = ? AND plate_number = ?`;
+    
+    db.get(checkQuery, [email, plate_number], async (err, user) => {
+        if (err) return res.status(500).json({ error: "Sunucu hatası." });
+        if (!user) return res.status(404).json({ error: "Girilen e-posta ile plaka eşleşmedi veya sistemde bulunamadı." });
+
+        try {
+            // Eşleşme başarılıysa yeni şifreyi hashle ve kaydet
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            const updateQuery = `UPDATE users SET password = ? WHERE id = ?`;
+            
+            db.run(updateQuery, [hashedPassword, user.id], function(err) {
+                if (err) return res.status(500).json({ error: "Şifre güncellenirken bir hata oluştu." });
+                res.status(200).json({ message: "Şifreniz başarıyla sıfırlandı! Artık yeni şifrenizle giriş yapabilirsiniz." });
+            });
+        } catch (error) {
+            res.status(500).json({ error: "Şifre işlenirken hata oluştu." });
+        }
+    });
+});
 // --- ŞİFRE GÜNCELLEME ---
 app.put('/api/user/update-password', async (req, res) => {
     const { userId, newPassword } = req.body;
@@ -370,10 +404,9 @@ app.get('/api/admin/users', (req, res) => {
     });
 });
 
-// --- OTOMATİK REZERVASYON İPTALİ (CRON JOB) ---
-// Her 1 dakikada bir çalışarak süresi dolmuş rezervasyonları kontrol eder.
+// --- OTOMATİK REZERVASYON İPTALİ  ---
 setInterval(() => {
-    // Mevcut zaman (UTC) ile rezervasyon zamanını (arrival_time + 60 dk ek süre) karşılaştırır
+
     const query = `
         SELECT r.id, r.slot_number 
         FROM reservations r 
@@ -390,14 +423,13 @@ setInterval(() => {
 
         if (rows && rows.length > 0) {
             rows.forEach(row => {
-                // 1. Rezervasyonu iptal et / sil
+                
                 db.run(`DELETE FROM reservations WHERE id = ?`, [row.id], function(err) {
                     if (err) {
                         console.error(`Rezervasyon ${row.id} silinirken hata:`, err.message);
                         return;
                     }
 
-                    // 2. Otopark alanını tekrar 'empty' yap
                     db.run(`UPDATE parking_slots SET status = 'empty' WHERE slot_number = ?`, [row.slot_number], function(err) {
                         if (err) {
                             console.error(`Slot ${row.slot_number} güncellenirken hata:`, err.message);
