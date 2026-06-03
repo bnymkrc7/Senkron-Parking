@@ -494,7 +494,7 @@ app.post('/api/subscription/apply', (req, res) => {
 
 // 2. Admin: Tüm Abonelikleri Listele
 app.get('/api/admin/subscriptions', (req, res) => {
-    const query = `SELECT * FROM subscriptions WHERE status = 'beklemede' ORDER BY created_at DESC`;
+    const query = `SELECT * FROM subscriptions ORDER BY created_at DESC`;
     db.all(query, [], (err, rows) => {
         if (err) return res.status(500).json({ error: "Abonelikler alınamadı." });
         res.status(200).json(rows);
@@ -512,6 +512,16 @@ app.patch('/api/admin/subscriptions/:id', (req, res) => {
     db.run(query, [status, id], function(err) {
         if (err) return res.status(500).json({ error: "Durum güncellenemedi." });
         res.status(200).json({ message: `Abonelik durumu '${status}' olarak güncellendi.` });
+    });
+});
+
+// Admin: Abonelik Başvurusunu Sil
+app.delete('/api/admin/subscriptions/:id', (req, res) => {
+    const { id } = req.params;
+    const query = `DELETE FROM subscriptions WHERE id = ?`;
+    db.run(query, [id], function(err) {
+        if (err) return res.status(500).json({ error: "Abonelik silinemedi." });
+        res.status(200).json({ message: "Abonelik başarıyla silindi." });
     });
 });
 

@@ -274,11 +274,18 @@ async function loadSubscriptions() {
             else if (s.status === 'onaylandı') statusBadge = '<span class="badge-status bg-success">Onaylandı</span>';
             else statusBadge = '<span class="badge-status bg-danger">Reddedildi</span>';
 
-            let actionBtns = s.status === 'beklemede' ? `
+            let actionBtns = `
                 <button class="btn btn-sm btn-outline-info rounded-pill px-2 py-0 me-1" onclick="showSubDetails(${s.id})" title="Detay"><i class="fa-solid fa-magnifying-glass"></i></button>
+            `;
+            if (s.status === 'beklemede') {
+                actionBtns += `
                 <button class="btn btn-sm btn-outline-success rounded-pill px-2 py-0 me-1" onclick="updateSubscription(${s.id}, 'onaylandı')" title="Onayla"><i class="fa-solid fa-check"></i></button>
-                <button class="btn btn-sm btn-outline-danger rounded-pill px-2 py-0" onclick="updateSubscription(${s.id}, 'reddedildi')" title="Reddet"><i class="fa-solid fa-xmark"></i></button>
-            ` : '-';
+                <button class="btn btn-sm btn-outline-danger rounded-pill px-2 py-0 me-1" onclick="updateSubscription(${s.id}, 'reddedildi')" title="Reddet"><i class="fa-solid fa-xmark"></i></button>
+                `;
+            }
+            actionBtns += `
+                <button class="btn btn-sm btn-outline-danger rounded-pill px-2 py-0" onclick="deleteSubscription(${s.id})" title="Sil"><i class="fa-solid fa-trash-can"></i></button>
+            `;
 
             return `<tr>
                 <td>${s.username}</td>
@@ -315,6 +322,14 @@ async function updateSubscription(id, status) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ status })
         });
+        refreshAll();
+    } catch(e) { alert('Hata: ' + e.message); }
+}
+
+async function deleteSubscription(id) {
+    if (!confirm('Bu abonelik başvurusunu tamamen silmek istediğinize emin misiniz?')) return;
+    try {
+        await fetch('/api/admin/subscriptions/' + id, { method: 'DELETE' });
         refreshAll();
     } catch(e) { alert('Hata: ' + e.message); }
 }
