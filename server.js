@@ -404,6 +404,37 @@ app.get('/api/admin/users', (req, res) => {
     });
 });
 
+// --- ADMIN: KULLANICIYI VE TÜM VERİLERİNİ SİL ---
+app.delete('/api/admin/users/:id', (req, res) => {
+    const { id } = req.params;
+
+    db.get(`SELECT username, email FROM users WHERE id = ?`, [id], (err, user) => {
+        if (err || !user) return res.status(404).json({ error: "Kullanıcı bulunamadı." });
+
+        const { username, email } = user;
+
+        db.all(`SELECT slot_number FROM reservations WHERE username = ?`, [username], (err, rows) => {
+            if (!err && rows && rows.length > 0) {
+                rows.forEach(row => {
+                    db.run(`UPDATE parking_slots SET status = 'empty' WHERE slot_number = ?`, [row.slot_number]);
+                });
+            }
+
+            db.serialize(() => {
+                db.run(`DELETE FROM reservations WHERE username = ?`, [username]);
+                db.run(`DELETE FROM user_vehicles WHERE username = ?`, [username]);
+                db.run(`DELETE FROM subscriptions WHERE username = ?`, [username]);
+                db.run(`DELETE FROM feedbacks WHERE email = ?`, [email]);
+                
+                db.run(`DELETE FROM users WHERE id = ?`, [id], function(err) {
+                    if (err) return res.status(500).json({ error: "Kullanıcı silinemedi." });
+                    res.status(200).json({ message: "Kullanıcı ve ilişkili tüm verileri başarıyla silindi." });
+                });
+            });
+        });
+    });
+});
+
 // --- OTOMATİK REZERVASYON İPTALİ  ---
 setInterval(() => {
 
