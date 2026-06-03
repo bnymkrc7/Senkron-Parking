@@ -139,8 +139,8 @@
                 <div class="section-title"><i class="fa-solid fa-comment-dots"></i>Öneri ve Şikayetler</div>
                 <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
                     <table class="table table-dark-custom mb-0">
-                        <thead><tr><th>İsim</th><th>Kategori</th><th>Mesaj</th><th>Tarih</th></tr></thead>
-                        <tbody id="feedbacksTable"><tr><td colspan="4" class="text-center text-secondary">Yükleniyor...</td></tr></tbody>
+                        <thead><tr><th>İsim</th><th>Kategori</th><th>Mesaj</th><th>Tarih</th><th>İşlem</th></tr></thead>
+                        <tbody id="feedbacksTable"><tr><td colspan="5" class="text-center text-secondary">Yükleniyor...</td></tr></tbody>
                     </table>
                 </div>
             </div>
@@ -252,6 +252,7 @@ async function loadSubscriptions() {
         const res = await fetch('/api/admin/subscriptions');
         const rows = await res.json();
         const tbody = document.getElementById('subscriptionsTable');
+        window.allSubscriptions = rows;
         if (rows.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center text-secondary">Başvuru yok</td></tr>'; return; }
         tbody.innerHTML = rows.map(s => {
             let statusBadge = '';
@@ -260,6 +261,7 @@ async function loadSubscriptions() {
             else statusBadge = '<span class="badge-status bg-danger">Reddedildi</span>';
 
             let actionBtns = s.status === 'beklemede' ? `
+                <button class="btn btn-sm btn-outline-info rounded-pill px-2 py-0 me-1" onclick="showSubDetails(${s.id})" title="Detay"><i class="fa-solid fa-magnifying-glass"></i></button>
                 <button class="btn btn-sm btn-outline-success rounded-pill px-2 py-0 me-1" onclick="updateSubscription(${s.id}, 'onaylandı')" title="Onayla"><i class="fa-solid fa-check"></i></button>
                 <button class="btn btn-sm btn-outline-danger rounded-pill px-2 py-0" onclick="updateSubscription(${s.id}, 'reddedildi')" title="Reddet"><i class="fa-solid fa-xmark"></i></button>
             ` : '-';
@@ -272,6 +274,23 @@ async function loadSubscriptions() {
             </tr>`;
         }).join('');
     } catch(e) { console.error(e); }
+}
+
+function showSubDetails(id) {
+    const s = window.allSubscriptions.find(x => x.id === id);
+    if (!s) return;
+    const tbody = document.getElementById('subDetailsBody');
+    tbody.innerHTML = `
+        <tr><td class="text-secondary">Ad Soyad</td><td>${s.first_name} ${s.last_name}</td></tr>
+        <tr><td class="text-secondary">E-posta</td><td>${s.email}</td></tr>
+        <tr><td class="text-secondary">Telefon</td><td>${s.phone}</td></tr>
+        <tr><td class="text-secondary">TC No</td><td>${s.tc_no}</td></tr>
+        <tr><td class="text-secondary">Araç Plakası</td><td><span style="color: #6ee7b7; font-weight: bold;">${s.plate_number}</span></td></tr>
+        <tr><td class="text-secondary">Araç Marka/Model</td><td>${s.brand_model}</td></tr>
+        <tr><td class="text-secondary">Abonelik Tipi</td><td>${s.subscription_type}</td></tr>
+        <tr><td class="text-secondary">Otopark Lokasyonu</td><td>${s.parking_location}</td></tr>
+    `;
+    new bootstrap.Modal(document.getElementById('subDetailsModal')).show();
 }
 
 async function updateSubscription(id, status) {
@@ -319,27 +338,68 @@ async function loadFeedbacks() {
         const res = await fetch('/api/admin/feedbacks');
         const rows = await res.json();
         const tbody = document.getElementById('feedbacksTable');
-        if (rows.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="text-center text-secondary">Henüz mesaj yok</td></tr>'; return; }
+        if (rows.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="text-center text-secondary">Henüz mesaj yok</td></tr>'; return; }
         tbody.innerHTML = rows.map(f => {
             let catBadge = '';
             if (f.category === 'Öneri') catBadge = '<span class="badge-status bg-info">Öneri</span>';
             else if (f.category === 'Şikayet') catBadge = '<span class="badge-status bg-danger">Şikayet</span>';
             else catBadge = '<span class="badge-status bg-secondary">Bilgi</span>';
             const date = new Date(f.created_at).toLocaleDateString('tr-TR');
-            return `<tr>
+            const rowClass = f.is_read ? 'opacity-75' : '';
+            const readBtn = f.is_read ? '' : `<button class="btn btn-sm btn-outline-success rounded-pill px-2 py-0 me-1" onclick="markFeedbackRead(${f.id})" title="Okundu Olarak İşaretle"><i class="fa-solid fa-check-double"></i></button>`;
+            
+            return `<tr class="${rowClass}">
                 <td><small>${f.full_name}</small><br><span class="text-secondary" style="font-size:0.7rem">${f.email}</span></td>
                 <td>${catBadge}</td>
                 <td><small>${f.message.length > 60 ? f.message.substring(0, 60) + '...' : f.message}</small></td>
                 <td><small class="text-secondary">${date}</small></td>
+                <td>
+                    ${readBtn}
+                    <button class="btn btn-sm btn-outline-danger rounded-pill px-2 py-0" onclick="deleteFeedback(${f.id})" title="Sil"><i class="fa-solid fa-trash-can"></i></button>
+                </td>
             </tr>`;
         }).join('');
     } catch(e) { console.error(e); }
 }
 
 // --- YENİLE ---
+async function markFeedbackRead(id) {
+    try {
+        await fetch('/api/admin/feedbacks/' + id + '/read', { method: 'PATCH' });
+        refreshAll();
+    } catch(e) { alert('Hata: ' + e.message); }
+}
+
+async function deleteFeedback(id) {
+    if (!confirm('Bu mesajı silmek istediğinize emin misiniz?')) return;
+    try {
+        await fetch('/api/admin/feedbacks/' + id, { method: 'DELETE' });
+        refreshAll();
+    } catch(e) { alert('Hata: ' + e.message); }
+}
+
 function refreshAll() { loadDashboard(); loadMap(); loadReservations(); loadUsers(); loadSubscriptions(); loadFeedbacks(); }
 refreshAll();
 setInterval(refreshAll, 10000);
 </script>
+
+<!-- Subscription Details Modal -->
+<div class="modal fade" id="subDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background:#1e293b; color:#e2e8f0; border:1px solid rgba(255,255,255,0.1);">
+            <div class="modal-header border-bottom-0">
+                <h5 class="modal-title fw-bold text-primary"><i class="fa-solid fa-car me-2"></i>Abonelik / Araç Detayları</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <table class="table table-dark-custom mb-0">
+                    <tbody id="subDetailsBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Bootstrap JS for Modal -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

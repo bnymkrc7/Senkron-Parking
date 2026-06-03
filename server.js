@@ -463,7 +463,7 @@ app.post('/api/subscription/apply', (req, res) => {
 
 // 2. Admin: Tüm Abonelikleri Listele
 app.get('/api/admin/subscriptions', (req, res) => {
-    const query = `SELECT * FROM subscriptions ORDER BY created_at DESC`;
+    const query = `SELECT * FROM subscriptions WHERE status = 'beklemede' ORDER BY created_at DESC`;
     db.all(query, [], (err, rows) => {
         if (err) return res.status(500).json({ error: "Abonelikler alınamadı." });
         res.status(200).json(rows);
@@ -517,6 +517,26 @@ app.get('/api/admin/feedbacks', (req, res) => {
     db.all(query, [], (err, rows) => {
         if (err) return res.status(500).json({ error: "Geri bildirimler alınamadı." });
         res.status(200).json(rows);
+    });
+});
+
+// 3. Admin: Öneri/Şikayet Sil
+app.delete('/api/admin/feedbacks/:id', (req, res) => {
+    const { id } = req.params;
+    const query = `DELETE FROM feedbacks WHERE id = ?`;
+    db.run(query, [id], function(err) {
+        if (err) return res.status(500).json({ error: "Mesaj silinemedi." });
+        res.status(200).json({ message: "Mesaj başarıyla silindi." });
+    });
+});
+
+// 4. Admin: Öneri/Şikayet Okundu İşaretle
+app.patch('/api/admin/feedbacks/:id/read', (req, res) => {
+    const { id } = req.params;
+    const query = `UPDATE feedbacks SET is_read = 1 WHERE id = ?`;
+    db.run(query, [id], function(err) {
+        if (err) return res.status(500).json({ error: "Durum güncellenemedi." });
+        res.status(200).json({ message: "Okundu olarak işaretlendi." });
     });
 });
 
