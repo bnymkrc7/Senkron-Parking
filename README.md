@@ -12,7 +12,9 @@ Akıllı Otopark Yönetim Sistemi, şehirlerde yaşanan park yeri bulma problemi
 ## Ekip
 - **Bünyamin** (Frontend)
 - **Ebrar** (Frontend)
-- *(Diğer takım arkadaşları eklenecek)*
+- **Sevde** (Backend)
+- **Yağmur** (Scrum Master)
+- **Şeyma** (Prodact Owner)
 
 ## Kurulum ve Çalıştırma
 Sadece `index.html` dosyasını herhangi bir tarayıcıda (Chrome, Edge vb.) açmanız veya VS Code üzerinde "Live Server" eklentisi ile çalıştırmanız yeterlidir.
